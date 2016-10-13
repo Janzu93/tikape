@@ -15,6 +15,11 @@ public class Main {
 
         OpiskelijaDao opiskelijaDao = new OpiskelijaDao(database);
 
+        // asetetaan portti jos heroku antaa PORT-ympäristömuuttujan
+        if (System.getenv("PORT") != null) {
+            port(Integer.valueOf(System.getenv("PORT")));
+        }
+
         get("/", (req, res) -> {
             HashMap map = new HashMap<>();
             map.put("viesti", "tervehdys");
