@@ -51,7 +51,7 @@ public class Database {
                 + "aika timestamp,\n"
                 + "viestiketju_id integer,\n"
                 + "kayttaja_id integer\n"
-                + ");"
+                + ");");
 
         lista.add("CREATE TABLE Kayttaja (\n"
                 + "ID integer PRIMARY KEY AUTOINCREMENT,\n"
