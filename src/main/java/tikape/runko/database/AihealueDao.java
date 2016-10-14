@@ -55,7 +55,7 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         List<Aihealue> aihealueet = new ArrayList<>();
         while (rs.next()) {
             Integer id = rs.getInt("id");
-            String nimi = rs.getString("nimi");
+            String nimi = rs.getString("otsikko");
 
             aihealueet.add(new Aihealue(id, nimi));
         }
@@ -75,6 +75,15 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Aihealue WHERE id = ?;");
 
+    }
+    public void create(String nimi) throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Aihealue(otsikko) VALUES(?)");
+        stmt.setObject(1, nimi);
+        
+        stmt.execute();
+        
+        
     }
 
 }

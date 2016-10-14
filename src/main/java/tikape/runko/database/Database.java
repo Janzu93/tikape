@@ -67,10 +67,10 @@ public class Database {
         // Säilytetään esimerkki toistaiseksi
         
         
-        lista.add("CREATE TABLE Opiskelija (id integer PRIMARY KEY, nimi varchar(255));");
-        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Platon');");
-        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Aristoteles');");
-        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Homeros');");
+//        lista.add("CREATE TABLE Opiskelija (id integer PRIMARY KEY, nimi varchar(255));");
+//        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Platon');");
+//        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Aristoteles');");
+//        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Homeros');");
 
         return lista;
     }

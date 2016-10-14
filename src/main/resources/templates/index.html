@@ -2,15 +2,24 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 
     <head>
-        <title>Otsikko</title>
+        <title>4umiChan</title>
         <meta charset="utf-8" />
     </head>
 
     <body>
-        <h1>Heippa vaan!</h1>
-
-        <p>Ja .. <span th:text="${viesti}">jotain?</span></p>
-
-        <p><a href="/opiskelijat">Tästä opiskelijalistaukseen.</a></p>
+        <h1>Tervetuloa keskustelemaan 4umiChanissa</h1>
+        <ul>
+            <li th:each="aihealue : ${aihealueet}">
+                
+                <a th:href="@{~/aihealue/{id}(id=${aihealue.id})}">
+                    <span th:text="${aihealue.otsikko}">jotain?</span>
+                </a>
+            </li>
+        </ul>
+        
+        <form method="POST">
+            <input type="text" name="otsikko"/>
+            <input type="submit" value="lisää!"/>
+        </form>
     </body>
 </html>
