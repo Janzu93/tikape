@@ -12,7 +12,6 @@ import tikape.runko.domain.Viesti;
  *
  * @author janne
  */
-
 public class ViestiDao implements Dao<Viesti, Integer> {
 
     private Database database;
@@ -34,10 +33,10 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         }
 
         Integer id = rs.getInt("id");
-        String nimi = rs.getString("nimi");
+        String teksti = rs.getString("teksti");
         String aika = rs.getTimestamp("aika").toString();
 
-        Viesti viesti = new Viesti(id, nimi, aika);
+        Viesti viesti = new Viesti(id, teksti, aika);
 
         rs.close();
         stmt.close();
@@ -56,10 +55,33 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         List<Viesti> viestit = new ArrayList<>();
         while (rs.next()) {
             Integer id = rs.getInt("id");
-            String nimi = rs.getString("nimi");
+            String teksti = rs.getString("teksti");
             String aika = rs.getTimestamp("aika").toString();
 
-            viestit.add(new Viesti(id, nimi, aika));
+            viestit.add(new Viesti(id, teksti, aika));
+        }
+
+        rs.close();
+        stmt.close();
+        connection.close();
+
+        return viestit;
+    }
+
+    public List<Viesti> findAll(int ketjuId) throws SQLException {
+
+        Connection connection = database.getConnection();
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?;");
+        stmt.setObject(1, ketjuId);
+
+        ResultSet rs = stmt.executeQuery();
+        List<Viesti> viestit = new ArrayList<>();
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            String teksti = rs.getString("teksti");
+            //String aika = rs.getTimestamp("aika").toString();
+
+            viestit.add(new Viesti(id, teksti, "12121321"));
         }
 
         rs.close();
@@ -71,11 +93,21 @@ public class ViestiDao implements Dao<Viesti, Integer> {
 
     @Override
     public void delete(Integer key) throws SQLException {
-        
+
         // W.I.P
-        
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Viesti WHERE id = ?;");
+    }
+
+    public void create(String nimi, int ketjuId) throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Viesti(teksti, viestiketju_id) VALUES(?, ?)");
+        stmt.setObject(1, nimi);
+        stmt.setObject(2, ketjuId);
+
+        stmt.execute();
+        conn.close();
+
     }
 
 }

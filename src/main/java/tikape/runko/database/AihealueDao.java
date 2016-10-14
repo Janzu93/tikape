@@ -82,7 +82,7 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         stmt.setObject(1, nimi);
         
         stmt.execute();
-        
+        conn.close();
         
     }
 

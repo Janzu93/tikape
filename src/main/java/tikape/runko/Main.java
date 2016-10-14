@@ -7,6 +7,7 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 import tikape.runko.database.AihealueDao;
 import tikape.runko.database.Database;
 import tikape.runko.database.OpiskelijaDao;
+import tikape.runko.database.ViestiDao;
 import tikape.runko.database.ViestiketjuDao;
 
 public class Main {
@@ -17,6 +18,7 @@ public class Main {
         AihealueDao ad = new AihealueDao(database);
         OpiskelijaDao opiskelijaDao = new OpiskelijaDao(database);
         ViestiketjuDao vkd = new ViestiketjuDao(database);
+        ViestiDao vd = new ViestiDao(database);
 
         // asetetaan portti jos heroku antaa PORT-ympäristömuuttujan
         if (System.getenv("PORT") != null) {
@@ -35,31 +37,40 @@ public class Main {
             res.redirect("/");
             return "ok";
         });
+        
+        
+        
         get("/aihealue/:id", (req, res) -> {
             HashMap map = new HashMap<>();
             map.put("ketjut", vkd.findAll(Integer.parseInt(req.params("id"))));
 
-            return new ModelAndView(map, "aihealue");
+            return new ModelAndView(map, "aihealue");   
         }, new ThymeleafTemplateEngine());
+        
         post("/aihealue/:id", (req, res) -> {
             vkd.create(req.queryParams("otsikko"), Integer.parseInt(req.params(":id")));
             res.redirect("/aihealue/"+req.params(":id"));
             return "ok";
         });
         
-
-        get("/opiskelijat", (req, res) -> {
+        
+        
+        
+        get("/ketju/:ketjuid", (req, res) -> {
             HashMap map = new HashMap<>();
-            map.put("opiskelijat", opiskelijaDao.findAll());
+            map.put("viestit", vd.findAll(Integer.parseInt(req.params(":ketjuid"))));
+            map.put("otsikko", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))).getOtsikko());
 
-            return new ModelAndView(map, "opiskelijat");
+            return new ModelAndView(map, "viestiketju");
         }, new ThymeleafTemplateEngine());
+        
+        post("/ketju/:ketjuid", (req, res) -> {
+            vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")));
+            
+            res.redirect("/ketju/"+req.params(":ketjuid"));
+            return "ok";
+        });
+        
 
-        get("/opiskelijat/:id", (req, res) -> {
-            HashMap map = new HashMap<>();
-            map.put("opiskelija", opiskelijaDao.findOne(Integer.parseInt(req.params("id"))));
-
-            return new ModelAndView(map, "opiskelija");
-        }, new ThymeleafTemplateEngine());
     }
 }

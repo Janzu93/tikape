@@ -34,7 +34,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         }
 
         Integer id = rs.getInt("id");
-        String nimi = rs.getString("nimi");
+        String nimi = rs.getString("otsikko");
 
         Viestiketju kayttaja = new Viestiketju(id, nimi);
 
@@ -106,7 +106,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         stmt.setObject(2, a);
         
         stmt.execute();
-        
+        conn.close();
         
     }
 
