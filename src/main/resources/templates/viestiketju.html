@@ -1,0 +1,22 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title>4umiChan</title>
+        <meta charset="utf-8" />
+    </head>
+
+    <body>
+        <h1 th:text ="${otsikko}"></h1>
+        <ul>
+            <li th:each="viesti : ${viestit}">
+                <span th:text="${viesti.teksti}">jotain?</span>
+            </li>
+        </ul>
+        
+        <form method="POST">
+            <input type="text" name="teksti"/>
+            <input type="submit" value="lisää!"/>
+        </form>
+    </body>
+</html>
