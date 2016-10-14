@@ -1,3 +1,3 @@
-# tikape-runko
+# 4UmiChan
 
 4UmiChanin gitti
