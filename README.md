@@ -1,4 +1,3 @@
 # tikape-runko
 
-Tietokantojen perusteet -kurssilla tehtävän web-sovelluksen pohja.
-
+4UmiChanin gitti
