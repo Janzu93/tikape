@@ -34,7 +34,7 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         }
 
         Integer id = rs.getInt("id");
-        String nimi = rs.getString("nimi");
+        String nimi = rs.getString("otsikko");
 
         Aihealue aihealue = new Aihealue(id, nimi);
 

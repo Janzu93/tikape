@@ -7,16 +7,18 @@
     </head>
 
     <body>
-        <h1>Tervetuloa keskustelemaan !!Aihealueesta!!</h1>
+        <h1 th:text="${otsikko}"></h1>
         <ul>
             <li th:each="ketju : ${ketjut}">
-                <span th:text="${ketju.otsikko}">jotain?</span>
+                <a th:href="@{~/ketju/{id}(id=${ketju.id})}">
+                    <span th:text="${ketju.otsikko}">jotain?</span>
+                </a>
             </li>
         </ul>
-        
+
         <form method="POST">
             <input type="text" name="otsikko"/>
-            <input type="submit" value="lisää!"/>
+            <input type="submit" value="Uusi viestiketju"/>
         </form>
     </body>
 </html>
