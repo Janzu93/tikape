@@ -12,7 +12,6 @@ import tikape.runko.domain.Viestiketju;
  *
  * @author janne
  */
-
 public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
 
     private Database database;
@@ -66,8 +65,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
 
         return viestiketjut;
     }
-    
-    
+
     public List<Viestiketju> findAll(int aihealueId) throws SQLException {
 
         Connection connection = database.getConnection();
@@ -92,54 +90,58 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
 
     @Override
     public void delete(Integer key) throws SQLException {
-        
-        // W.I.P
-        
+
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Viestiketju WHERE id = ?;");
 
+        stmt.setObject(1, key);
+
+        stmt.execute();
+        conn.close();
+
     }
+
     public void create(String nimi, int a) throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO Viestiketju(otsikko, aihealue_id) VALUES(?, ?)");
         stmt.setObject(1, nimi);
         stmt.setObject(2, a);
-        
+
         stmt.execute();
         conn.close();
-        
+
     }
-    public int findAihealueId (int vkId) throws SQLException {
+
+    public int findAihealueId(int vkId) throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("SELECT aihealue_id FROM Viestiketju WHERE id = ?");
         stmt.setObject(1, vkId);
-        
+
         ResultSet rs = stmt.executeQuery();
         Integer id = -1;
-        
+
         while (rs.next()) {
             id = rs.getInt("aihealue_id");
         }
-        
+
         conn.close();
-        
+
         return id;
     }
-    
-    
+
     // Tämän metodin pitäisi toimia, miten hyödynnetään viestien laskussa? Kokeilin onneani - Ei toiminut :P
     public int countViestit(int vkId) throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("SELECT Count(viesti.id) FROM Viesti LEFT JOIN Viestiketju ON viesti.viestiketju_id = Viestiketju.id WHERE Viesti.viestiketju_id = ?");
         stmt.setObject(1, vkId);
-        
+
         ResultSet rs = stmt.executeQuery();
         Integer viestiLkm = -1;
-        
+
         while (rs.next()) {
             viestiLkm = rs.getInt(1);
         }
-        
+
         return viestiLkm;
     }
 

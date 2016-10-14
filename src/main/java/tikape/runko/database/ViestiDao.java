@@ -94,9 +94,13 @@ public class ViestiDao implements Dao<Viesti, Integer> {
     @Override
     public void delete(Integer key) throws SQLException {
 
-        // W.I.P
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Viesti WHERE id = ?;");
+
+        stmt.setObject(1, key);
+
+        stmt.execute();
+        conn.close();
     }
 
     public void create(String nimi, int ketjuId) throws SQLException {
