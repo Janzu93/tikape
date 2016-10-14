@@ -109,5 +109,21 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         conn.close();
         
     }
+    public int findAihealueId (int vkId) throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("SELECT aihealue_id FROM Viestiketju WHERE id = ?");
+        stmt.setObject(1, vkId);
+        
+        ResultSet rs = stmt.executeQuery();
+        Integer id = -1;
+        
+        while (rs.next()) {
+            id = rs.getInt("aihealue_id");
+        }
+        
+        conn.close();
+        
+        return id;
+    }
 
 }

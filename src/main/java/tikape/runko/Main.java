@@ -42,7 +42,7 @@ public class Main {
         
         get("/aihealue/:id", (req, res) -> {
             HashMap map = new HashMap<>();
-            map.put("ketjut", vkd.findAll(Integer.parseInt(req.params("id"))));
+            map.put("ketjut", vkd.findAll(Integer.parseInt(req.params(":id"))));
             map.put("otsikko", ad.findOne(Integer.parseInt(req.params(":id"))).getOtsikko());
 
             return new ModelAndView(map, "aihealue");   
@@ -61,6 +61,7 @@ public class Main {
             HashMap map = new HashMap<>();
             map.put("viestit", vd.findAll(Integer.parseInt(req.params(":ketjuid"))));
             map.put("otsikko", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))).getOtsikko());
+            map.put("aihealueId", vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))));
 
             return new ModelAndView(map, "viestiketju");
         }, new ThymeleafTemplateEngine());
