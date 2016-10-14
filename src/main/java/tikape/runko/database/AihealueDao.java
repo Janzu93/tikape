@@ -69,21 +69,21 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
 
     @Override
     public void delete(Integer key) throws SQLException {
-        
+
         // W.I.P
-        
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Aihealue WHERE id = ?;");
 
     }
+
     public void create(String nimi) throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO Aihealue(otsikko) VALUES(?)");
         stmt.setObject(1, nimi);
-        
+
         stmt.execute();
         conn.close();
-        
+
     }
 
 }

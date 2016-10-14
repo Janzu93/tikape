@@ -11,7 +11,7 @@
         <ul>
             <li th:each="ketju : ${ketjut}">
                 <a th:href="@{~/ketju/{id}(id=${ketju.id})}">
-                    <span th:text="${ketju.otsikko}">jotain?</span>
+                    <span th:text="${ketju.otsikko}">Viestien otsikot</span>
                 </a>
             </li>
         </ul>
@@ -20,5 +20,8 @@
             <input type="text" name="otsikko"/>
             <input type="submit" value="Uusi viestiketju"/>
         </form>
+        <a href = "/">
+            <span>Takaisin edelliselle sivulle</span>
+        </a>
     </body>
 </html>

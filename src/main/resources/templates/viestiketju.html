@@ -10,7 +10,7 @@
         <h1 th:text ="${otsikko}"></h1>
         <ul>
             <li th:each="viesti : ${viestit}">
-                <span th:text="${viesti.teksti}">jotain?</span>
+                <span th:text="${viesti.teksti}">Tässä on viestin teksti</span>
             </li>
         </ul>
         
@@ -19,7 +19,7 @@
             <input type="submit" value="Uusi viesti"/>
         </form>
         <a th:href="@{~/aihealue/{id}(id=${aihealueId})}">
-                    <span>jotain?</span>
+                    <span>Takaisin edelliselle sivulle</span>
                 </a>
     </body>
 </html>

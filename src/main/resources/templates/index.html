@@ -10,13 +10,13 @@
         <h1>Tervetuloa keskustelemaan 4umiChanissa</h1>
         <ul>
             <li th:each="aihealue : ${aihealueet}">
-                
+
                 <a th:href="@{~/aihealue/{id}(id=${aihealue.id})}">
                     <span th:text="${aihealue.otsikko}">jotain?</span>
                 </a>
             </li>
         </ul>
-        
+
         <form method="POST">
             <input type="text" name="otsikko"/>
             <input type="submit" value="Uusi Aihealue"/>

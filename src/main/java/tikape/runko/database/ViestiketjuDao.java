@@ -125,5 +125,22 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         
         return id;
     }
+    
+    
+    // Tämän metodin pitäisi toimia, miten hyödynnetään viestien laskussa? Kokeilin onneani - Ei toiminut :P
+    public int countViestit(int vkId) throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("SELECT Count(viesti.id) FROM Viesti LEFT JOIN Viestiketju ON viesti.viestiketju_id = Viestiketju.id WHERE Viesti.viestiketju_id = ?");
+        stmt.setObject(1, vkId);
+        
+        ResultSet rs = stmt.executeQuery();
+        Integer viestiLkm = -1;
+        
+        while (rs.next()) {
+            viestiLkm = rs.getInt(1);
+        }
+        
+        return viestiLkm;
+    }
 
 }
