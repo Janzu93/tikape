@@ -11,7 +11,11 @@
         <ul>
             <li th:each="viesti : ${viestit}">
                 <span th:text="${viesti.teksti}">Tässä on viestin teksti</span>
+                <form th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
+                    <input type="submit" value="Poista"/>
+                </form>
             </li>
+            
         </ul>
         
         <form method="POST">

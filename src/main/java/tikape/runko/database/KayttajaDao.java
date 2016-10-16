@@ -12,7 +12,6 @@ import tikape.runko.domain.Kayttaja;
  *
  * @author janne
  */
-
 public class KayttajaDao implements Dao<Kayttaja, Integer> {
 
     private Database database;
@@ -69,17 +68,17 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
 
     @Override
     public void delete(Integer key) throws SQLException {
-        
+
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Kayttaja WHERE id = ?;");
         stmt.setObject(1, key);
-        
+
         stmt.execute();
         conn.close();
 
     }
-    
-        public void create(String nimi) throws SQLException {
+
+    public void create(String nimi) throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO Kayttaja(nimimerkki) VALUES(?)");
         stmt.setObject(1, nimi);

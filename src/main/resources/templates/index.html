@@ -14,6 +14,9 @@
                 <a th:href="@{~/aihealue/{id}(id=${aihealue.id})}">
                     <span th:text="${aihealue.otsikko}">jotain?</span>
                 </a>
+                <form th:action="@{~/aihealue/{id}/delete(id=${aihealue.id})}" method="POST">
+                    <input type="submit" value="Poista"/>
+                </form>
             </li>
         </ul>
 
@@ -21,5 +24,8 @@
             <input type="text" name="otsikko"/>
             <input type="submit" value="Uusi Aihealue"/>
         </form>
+        <a href= "/login">Kirjautumiseen</a>
+        
+
     </body>
 </html>

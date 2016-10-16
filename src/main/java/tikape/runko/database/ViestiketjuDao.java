@@ -92,11 +92,23 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
     public void delete(Integer key) throws SQLException {
 
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Viestiketju WHERE id = ?;");
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Viestiketju WHERE id = ?;");
 
         stmt.setObject(1, key);
 
         stmt.execute();
+        
+        //poistetaan myös kaikki viestiketjuun liittyvät viestit (toiminnalisuuden voi siirtää myös mainiin, mutta siistimpi täällä)
+        ViestiDao vd = new ViestiDao(this.database);
+        stmt = conn.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?;");
+        stmt.setObject(1, key);
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            vd.delete(id);
+        }
+        stmt.close();
         conn.close();
 
     }
@@ -108,13 +120,14 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         stmt.setObject(2, a);
 
         stmt.execute();
+        stmt.close();
         conn.close();
 
     }
 
     public int findAihealueId(int vkId) throws SQLException {
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("SELECT aihealue_id FROM Viestiketju WHERE id = ?");
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Viestiketju WHERE id = ?");
         stmt.setObject(1, vkId);
 
         ResultSet rs = stmt.executeQuery();
@@ -124,6 +137,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
             id = rs.getInt("aihealue_id");
         }
 
+        stmt.close();
         conn.close();
 
         return id;
@@ -132,16 +146,17 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
     // Tämän metodin pitäisi toimia, miten hyödynnetään viestien laskussa? Kokeilin onneani - Ei toiminut :P
     public int countViestit(int vkId) throws SQLException {
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("SELECT Count(viesti.id) FROM Viesti LEFT JOIN Viestiketju ON viesti.viestiketju_id = Viestiketju.id WHERE Viesti.viestiketju_id = ?");
+        PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) AS lkm FROM Viesti WHERE Viesti.viestiketju_id = ?");
         stmt.setObject(1, vkId);
 
         ResultSet rs = stmt.executeQuery();
         Integer viestiLkm = -1;
 
         while (rs.next()) {
-            viestiLkm = rs.getInt(1);
+            viestiLkm = rs.getInt("lkm");
         }
-
+        stmt.close();
+        conn.close();
         return viestiLkm;
     }
 

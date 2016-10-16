@@ -71,10 +71,21 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
     public void delete(Integer key) throws SQLException {
         
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Aihealue WHERE id = ?;");
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Aihealue WHERE id = ?;");
         stmt.setObject(1, key);
-
         stmt.execute();
+        
+        //poistetaan myös viestiketjut, ks viestiketjuDao 
+        ViestiketjuDao vkd = new ViestiketjuDao(this.database);
+        stmt = conn.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?;");
+        stmt.setObject(1, key);
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            vkd.delete(id);
+        }
+        stmt.close();
         conn.close();
 
     }
@@ -85,6 +96,7 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         stmt.setObject(1, nimi);
 
         stmt.execute();
+        stmt.close();
         conn.close();
 
     }

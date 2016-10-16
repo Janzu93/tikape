@@ -95,11 +95,12 @@ public class ViestiDao implements Dao<Viesti, Integer> {
     public void delete(Integer key) throws SQLException {
 
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("DELETE * FROM Viesti WHERE id = ?;");
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Viesti WHERE id = ?;");
 
         stmt.setObject(1, key);
 
         stmt.execute();
+        stmt.close();
         conn.close();
     }
 
@@ -110,8 +111,28 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         stmt.setObject(2, ketjuId);
 
         stmt.execute();
+        stmt.close();
         conn.close();
 
+    }
+    
+    //Haetaan ketjuId viestiId:n perusteella, poista komennon uudelleenohjaamista varten
+    public int getKetjuId(int viestiId) throws SQLException{
+        Connection connection = database.getConnection();
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE id = ?;");
+        stmt.setObject(1, viestiId);
+        
+        ResultSet rs = stmt.executeQuery();
+        int ketjuId = -1;
+        while (rs.next()) {
+            ketjuId = rs.getInt("viestiketju_id");
+        }
+
+        rs.close();
+        stmt.close();
+        connection.close();
+
+        return ketjuId;
     }
 
 }
