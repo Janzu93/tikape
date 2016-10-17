@@ -79,7 +79,7 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         while (rs.next()) {
             Integer id = rs.getInt("id");
             String teksti = rs.getString("teksti");
-            //String aika = rs.getTimestamp("aika").toString();
+//            String aika = rs.getTimestamp("aika").toString();
 
             viestit.add(new Viesti(id, teksti, "12121321"));
         }
