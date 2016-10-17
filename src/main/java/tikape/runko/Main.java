@@ -140,14 +140,12 @@ public class Main {
                     }
                     hexString.append(hex);
                 }
-                System.out.println(hexString.toString());
-                System.out.println(kayttaja.getHash());
                 if (kayttaja.getHash().equals(hexString.toString())) {
                     res.cookie("login", req.queryParams("kayttajanimi") + " " + hexString.toString());
+                    res.redirect("/");
                     return "kirjauduttu käyttäjällä " + req.queryParams("kayttajanimi");
                 }
             }
-
             return "Väärä käyttäjätunnus tai salasana";
         });
 
