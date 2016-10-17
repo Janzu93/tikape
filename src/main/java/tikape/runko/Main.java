@@ -35,6 +35,13 @@ public class Main {
             HashMap data = new HashMap<>();
             data.put("aihealueet", ad.findAll());
 
+            if (req.cookie("login") != null) {
+                String nimi = req.cookie("login").split(" ")[0];
+                data.put("login", "Olet kirjautunut käyttäjänä: " + nimi);
+            } else {
+                data.put("login", "Et ole kirjautunut");
+            }
+
             return new ModelAndView(data, "index");
         }, new ThymeleafTemplateEngine());
 
@@ -136,11 +143,19 @@ public class Main {
                 System.out.println(hexString.toString());
                 System.out.println(kayttaja.getHash());
                 if (kayttaja.getHash().equals(hexString.toString())) {
+                    res.cookie("login", req.queryParams("kayttajanimi") + " " + hexString.toString());
                     return "kirjauduttu käyttäjällä " + req.queryParams("kayttajanimi");
                 }
             }
 
             return "Väärä käyttäjätunnus tai salasana";
+        });
+
+        get("/logout", (req, res) -> {
+
+            res.removeCookie("login");
+            res.redirect("/");
+            return "ok";
         });
 
         get("/register", (req, res) -> {
