@@ -8,11 +8,16 @@
 
     <body>
         <h2>Kirjaudu sisään</h2>
-        
-        
+
+
         <form method="POST">
             <input type="text" name="kayttajanimi"/>
-            <input type="submit" value="Kirjaudu"/>
+            Salasana: <input type="password" name="salasana"/>
+            <input type="submit" onclick="submit" value="Kirjaudu"/>
         </form>
+        <script>
+            document.getElementById('kayttajanimi').submit();
+            document.getElementById('salasana').submit();
+        </script>
     </body>
 </html>
