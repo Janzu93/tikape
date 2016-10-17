@@ -11,6 +11,7 @@ import tikape.runko.database.ViestiDao;
 import tikape.runko.database.ViestiketjuDao;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import tikape.runko.domain.Kayttaja;
 
 public class Main {
 
@@ -114,16 +115,32 @@ public class Main {
         }, new ThymeleafTemplateEngine());
 
         post("/login", (req, res) -> {
+            Kayttaja kayttaja = kd.findOne(req.queryParams("kayttajanimi"));
 
-            //TODO käyttäjänimien oikea tarkastus
-            if (req.queryParams("kayttajanimi").equals("admin")) {
-                // Joku muuttuja jolla kerrotaan kirjautuminen sisään
-            } else {
+            if (kayttaja != null) {
+                String hashattava = req.queryParams("salasana").hashCode() + kayttaja.getSalt();
+                System.out.println(kayttaja.getSalt());
 
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                md.update(hashattava.getBytes());
+                byte byteData[] = md.digest();
+
+                StringBuffer hexString = new StringBuffer();
+                for (int i = 0; i < byteData.length; i++) {
+                    String hex = Integer.toHexString(0xff & byteData[i]);
+                    if (hex.length() == 1) {
+                        hexString.append('0');
+                    }
+                    hexString.append(hex);
+                }
+                System.out.println(hexString.toString());
+                System.out.println(kayttaja.getHash());
+                if (kayttaja.getHash().equals(hexString.toString())) {
+                    return "kirjauduttu käyttäjällä " + req.queryParams("kayttajanimi");
+                }
             }
 
-            res.redirect("/");
-            return "ok";
+            return "Väärä käyttäjätunnus tai salasana";
         });
 
         get("/register", (req, res) -> {
@@ -133,31 +150,30 @@ public class Main {
         }, new ThymeleafTemplateEngine());
 
         post("/register", (req, res) -> {
-            
-            // Eihän käyttäjää ole? Jos on siirrytään Elseen
+
+            // Eihän käyttäjänimi ole varattu? Jos on siirrytään Elseen
             if (kd.findOne(req.queryParams("kayttajanimi")) == null) {
 
                 /*Luodaan 128 merkkiä pitkä alfanumeerinen merkkijono joka tallennetaan suolaksi
                 Tämän EI OLE pakko olla uniikki (koska hash muodostetaan salasana+salt=hash kaavalla)
-                */
+                 */
                 String salt = genSalt(128);
                 String hashattava = req.queryParams("salasana").hashCode() + salt;
-                
+
                 /*
                 Kutsutaan Javan MessageDigest luokkaa jolla pystytään cryptataan merkkijonoja
                 Tässä tapauksessa SHA-256 joka on todettu teoriassa murtamattomaksi
                 MessageDigest käsittelee merkkijonoja bitteinä
-                */
+                 */
                 MessageDigest md = MessageDigest.getInstance("SHA-256");
                 md.update(hashattava.getBytes());
-                
+
                 // Tässä kohti bittijono muutetaan cryptattuun muotoon
                 byte byteData[] = md.digest();
-                
-                
+
                 /* Ja sitten hexa muotoiseksi merkkijonoksi, voisi toki muuttaa kaiketi myös
                 suoraan String muotoon mutta toimii se näinkin
-                */
+                 */
                 StringBuffer hexString = new StringBuffer();
                 for (int i = 0; i < byteData.length; i++) {
                     String hex = Integer.toHexString(0xff & byteData[i]);
@@ -166,20 +182,22 @@ public class Main {
                     }
                     hexString.append(hex);
                 }
-                
+
                 // Ja lopuksi luodaan käyttäjä ja muunnetaan hexString Stringiksi :)
                 kd.create(req.queryParams("kayttajanimi"), salt, hexString.toString());
-                
+
                 res.redirect("/");
                 return "ok";
 
             } else {
-                return "Error";
+                return "Error (Onko käyttäjänimi jo varattu?)";
+
             }
         });
 
     }
 
+    // Luo satunnaisen alfanumeerisen merkkijonon suolaksi
     public static String genSalt(int len) {
         String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         SecureRandom rnd = new SecureRandom();

@@ -33,9 +33,12 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
         }
 
         Integer id = rs.getInt("id");
-        String nimi = rs.getString("nimi");
+        String nimi = rs.getString("nimimerkki");
+        String salt = rs.getString("salt");
+        String hash = rs.getString("hash");
+        Integer tyyppi = rs.getInt("tyyppi");
 
-        Kayttaja kayttaja = new Kayttaja(id, nimi);
+        Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi);
 
         rs.close();
         stmt.close();
@@ -43,10 +46,10 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
 
         return kayttaja;
     }
-    
-        public Kayttaja findOne(String key) throws SQLException {
+
+    public Kayttaja findOne(String key) throws SQLException {
         Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT id, nimimerkki FROM Kayttaja WHERE nimimerkki = ?;");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Kayttaja WHERE nimimerkki = ?;");
         stmt.setObject(1, key);
 
         ResultSet rs = stmt.executeQuery();
@@ -57,8 +60,11 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
 
         Integer id = rs.getInt("id");
         String nimi = rs.getString("nimimerkki");
+        String salt = rs.getString("salt");
+        String hash = rs.getString("hash");
+        Integer tyyppi = rs.getInt("tyyppi");
 
-        Kayttaja kayttaja = new Kayttaja(id, nimi);
+        Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi);
 
         rs.close();
         stmt.close();
@@ -77,9 +83,12 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
         List<Kayttaja> kayttajat = new ArrayList<>();
         while (rs.next()) {
             Integer id = rs.getInt("id");
-            String nimi = rs.getString("nimi");
+            String nimi = rs.getString("nimimerkki");
+            String salt = rs.getString("salt");
+            String hash = rs.getString("hash");
+            Integer tyyppi = rs.getInt("tyyppi");
 
-            kayttajat.add(new Kayttaja(id, nimi));
+            Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi);
         }
 
         rs.close();

@@ -61,7 +61,8 @@ public class Database {
                 + "ID integer PRIMARY KEY AUTOINCREMENT,\n"
                 + "nimimerkki varchar,\n"
                 + "salt varchar,\n"
-                + "hash varchar\n"
+                + "hash varchar,\n"
+                + "tyyppi integer\n"
                 + ");");
 
         lista.add("CREATE TABLE Aihealue (\n"
