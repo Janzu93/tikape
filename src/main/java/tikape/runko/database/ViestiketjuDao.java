@@ -97,6 +97,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         stmt.setObject(1, key);
 
         stmt.execute();
+        stmt.close();
         
         //poistetaan myös kaikki viestiketjuun liittyvät viestit (toiminnalisuuden voi siirtää myös mainiin, mutta siistimpi täällä)
         ViestiDao vd = new ViestiDao(this.database);

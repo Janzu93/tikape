@@ -52,10 +52,16 @@ public class Database {
                 + "viestiketju_id integer,\n"
                 + "kayttaja_id integer\n"
                 + ");");
-
+        
+        // salasana cryptataan suolaa hyödyntäen ja tallennetaan cryptattuna tietokantaan
+        // salasanan tarkistus toteutetaan hyödyntäen vertailua "Syötettysalasana"+salt = salasana tietokannasta
+        // Jos merkkijonot täsmää voidaan olettaa käyttäjän syöttäneen sama salasana (koska hashayksen tulos muuttuu salasanan muuttuessa)
+        // Esim. Salasana=qwerty123 ja suola(random generoitu)=a4d niin hash luodaan cryptaamalla merkkijono qwerty123a4d
         lista.add("CREATE TABLE Kayttaja (\n"
                 + "ID integer PRIMARY KEY AUTOINCREMENT,\n"
-                + "nimimerkki varchar\n"
+                + "nimimerkki varchar,\n"
+                + "salt varchar,\n"
+                + "hash varchar\n"
                 + ");");
 
         lista.add("CREATE TABLE Aihealue (\n"
@@ -63,15 +69,6 @@ public class Database {
                 + "otsikko varchar\n"
                 + ");");
         
-        
-        // Säilytetään esimerkki toistaiseksi
-        
-        
-//        lista.add("CREATE TABLE Opiskelija (id integer PRIMARY KEY, nimi varchar(255));");
-//        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Platon');");
-//        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Aristoteles');");
-//        lista.add("INSERT INTO Opiskelija (nimi) VALUES ('Homeros');");
-
         return lista;
     }
 }

@@ -6,8 +6,11 @@ import static spark.Spark.*;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
 import tikape.runko.database.AihealueDao;
 import tikape.runko.database.Database;
+import tikape.runko.database.KayttajaDao;
 import tikape.runko.database.ViestiDao;
 import tikape.runko.database.ViestiketjuDao;
+import java.security.MessageDigest;
+import java.security.SecureRandom;
 
 public class Main {
 
@@ -18,7 +21,8 @@ public class Main {
         AihealueDao ad = new AihealueDao(database);
         ViestiketjuDao vkd = new ViestiketjuDao(database);
         ViestiDao vd = new ViestiDao(database);
-        Boolean kirjautunut = false;
+        KayttajaDao kd = new KayttajaDao(database);
+        // Boolean kirjautunut = false; ?
 
         // asetetaan portti jos heroku antaa PORT-ympäristömuuttujan
         if (System.getenv("PORT") != null) {
@@ -27,10 +31,10 @@ public class Main {
 
         // Etusivu - Listaa aihealueet
         get("/", (req, res) -> {
-            HashMap map = new HashMap<>();
-            map.put("aihealueet", ad.findAll());
+            HashMap data = new HashMap<>();
+            data.put("aihealueet", ad.findAll());
 
-            return new ModelAndView(map, "index");
+            return new ModelAndView(data, "index");
         }, new ThymeleafTemplateEngine());
 
         // Luo uusi aihealue (POST Index)
@@ -48,11 +52,11 @@ public class Main {
 
         // Listaa aihealueen kaikki viestiketjut
         get("/aihealue/:id", (req, res) -> {
-            HashMap map = new HashMap<>();
-            map.put("ketjut", vkd.findAll(Integer.parseInt(req.params(":id"))));
-            map.put("otsikko", ad.findOne(Integer.parseInt(req.params(":id"))).getOtsikko());
+            HashMap data = new HashMap<>();
+            data.put("ketjut", vkd.findAll(Integer.parseInt(req.params(":id"))));
+            data.put("otsikko", ad.findOne(Integer.parseInt(req.params(":id"))).getOtsikko());
 
-            return new ModelAndView(map, "aihealue");
+            return new ModelAndView(data, "aihealue");
         }, new ThymeleafTemplateEngine());
 
         // Luo uusi viestiketju (POST Aihealue)
@@ -68,16 +72,15 @@ public class Main {
             res.redirect("/aihealue/" + aihealueId);
             return "ok";
         });
-        
 
         // Listaa viestiketjun kaikki viestit
         get("/ketju/:ketjuid", (req, res) -> {
-            HashMap map = new HashMap<>();
-            map.put("viestit", vd.findAll(Integer.parseInt(req.params(":ketjuid"))));
-            map.put("otsikko", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))).getOtsikko());
-            map.put("aihealueId", vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))));
+            HashMap data = new HashMap<>();
+            data.put("viestit", vd.findAll(Integer.parseInt(req.params(":ketjuid"))));
+            data.put("otsikko", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))).getOtsikko());
+            data.put("aihealueId", vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))));
 
-            return new ModelAndView(map, "viestiketju");
+            return new ModelAndView(data, "viestiketju");
         }, new ThymeleafTemplateEngine());
 
         // Luo uusi viesti (POST Viestiketju)
@@ -87,39 +90,104 @@ public class Main {
             res.redirect("/ketju/" + req.params(":ketjuid"));
             return "ok";
         });
-        
+
         // Poista viesti
         post("/viesti/:id/delete", (req, res) -> {
             int ketjuId = vd.getKetjuId(Integer.parseInt(req.params(":id")));
             vd.delete(Integer.parseInt(req.params(":id")));
-            
-            // Teoriassa: jos poistaa viestiketjun viimeisen viestin, uudelleen ohjaa alkusivulle TODO: ohjaa aihealueen sivulle
-            if(vkd.countViestit(ketjuId) > 0) {
+
+            // Teoriassa: jos poistaa viestiketjun viimeisen viestin, uudelleen ohjaa alkusivulle
+            // Jos poistaa viimeisen viestin ketjusta niin eikö ketjukin kuulu poistua?
+            if (vkd.countViestit(ketjuId) > 0) {
                 res.redirect("/ketju/" + ketjuId);
             } else {
                 res.redirect("/");
+                vkd.delete(ketjuId);
             }
             return "ok";
         });
-        
-        get("/login", (req,res) -> {
-            HashMap map = new HashMap<>();
-            
-            return new ModelAndView(map, "login");
+
+        get("/login", (req, res) -> {
+            HashMap data = new HashMap<>();
+
+            return new ModelAndView(data, "login");
         }, new ThymeleafTemplateEngine());
-        
+
         post("/login", (req, res) -> {
-            
+
             //TODO käyttäjänimien oikea tarkastus
-            if(req.queryParams("kayttajanimi").equals("admin")) {
+            if (req.queryParams("kayttajanimi").equals("admin")) {
                 // Joku muuttuja jolla kerrotaan kirjautuminen sisään
             } else {
-                
+
             }
-            
+
             res.redirect("/");
             return "ok";
         });
 
+        get("/register", (req, res) -> {
+            HashMap data = new HashMap<>();
+
+            return new ModelAndView(data, "register");
+        }, new ThymeleafTemplateEngine());
+
+        post("/register", (req, res) -> {
+            
+            // Eihän käyttäjää ole? Jos on siirrytään Elseen
+            if (kd.findOne(req.queryParams("kayttajanimi")) == null) {
+
+                /*Luodaan 128 merkkiä pitkä alfanumeerinen merkkijono joka tallennetaan suolaksi
+                Tämän EI OLE pakko olla uniikki (koska hash muodostetaan salasana+salt=hash kaavalla)
+                */
+                String salt = genSalt(128);
+                String hashattava = req.queryParams("salasana").hashCode() + salt;
+                
+                /*
+                Kutsutaan Javan MessageDigest luokkaa jolla pystytään cryptataan merkkijonoja
+                Tässä tapauksessa SHA-256 joka on todettu teoriassa murtamattomaksi
+                MessageDigest käsittelee merkkijonoja bitteinä
+                */
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                md.update(hashattava.getBytes());
+                
+                // Tässä kohti bittijono muutetaan cryptattuun muotoon
+                byte byteData[] = md.digest();
+                
+                
+                /* Ja sitten hexa muotoiseksi merkkijonoksi, voisi toki muuttaa kaiketi myös
+                suoraan String muotoon mutta toimii se näinkin
+                */
+                StringBuffer hexString = new StringBuffer();
+                for (int i = 0; i < byteData.length; i++) {
+                    String hex = Integer.toHexString(0xff & byteData[i]);
+                    if (hex.length() == 1) {
+                        hexString.append('0');
+                    }
+                    hexString.append(hex);
+                }
+                
+                // Ja lopuksi luodaan käyttäjä ja muunnetaan hexString Stringiksi :)
+                kd.create(req.queryParams("kayttajanimi"), salt, hexString.toString());
+                
+                res.redirect("/");
+                return "ok";
+
+            } else {
+                return "Error";
+            }
+        });
+
     }
+
+    public static String genSalt(int len) {
+        String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        SecureRandom rnd = new SecureRandom();
+        StringBuilder sb = new StringBuilder(len);
+        for (int i = 0; i < len; i++) {
+            sb.append(AB.charAt(rnd.nextInt(AB.length())));
+        }
+        return sb.toString();
+    }
+
 }

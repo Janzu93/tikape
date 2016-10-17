@@ -75,11 +75,15 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         stmt.setObject(1, key);
         stmt.execute();
         
+        stmt.close();
+        
         //poistetaan myös viestiketjut, ks viestiketjuDao 
         ViestiketjuDao vkd = new ViestiketjuDao(this.database);
         stmt = conn.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?;");
         stmt.setObject(1, key);
         ResultSet rs = stmt.executeQuery();
+        
+        stmt.close();
         
         while (rs.next()) {
             Integer id = rs.getInt("id");
