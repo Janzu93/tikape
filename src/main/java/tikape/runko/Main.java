@@ -11,6 +11,8 @@ import tikape.runko.database.ViestiDao;
 import tikape.runko.database.ViestiketjuDao;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import tikape.runko.domain.Kayttaja;
 
 public class Main {
@@ -36,12 +38,18 @@ public class Main {
             data.put("aihealueet", ad.findAll());
 
             if (req.cookie("login") != null) {
-                String nimi = req.cookie("login").split(" ")[0];
-                data.put("login", "Olet kirjautunut käyttäjänä: " + nimi);
-            } else {
-                data.put("login", "Et ole kirjautunut");
-            }
+                
+                List<Kayttaja> kayttajat = kd.findAll();
+                
+                String nimi = loginCheckNimi(kayttajat, req.cookie("login"));
+                if (!nimi.equals("null")) {
+                    data.put("login", "Tervetuloa " + nimi);
+                    System.out.println("Käyttäjä tunnistettu onnistuneesti");
+                    return new ModelAndView(data, "index");
+                }
 
+            }
+            data.put("login", "Et ole kirjautunut sisään!");
             return new ModelAndView(data, "index");
         }, new ThymeleafTemplateEngine());
 
@@ -126,7 +134,6 @@ public class Main {
 
             if (kayttaja != null) {
                 String hashattava = req.queryParams("salasana").hashCode() + kayttaja.getSalt();
-                System.out.println(kayttaja.getSalt());
 
                 MessageDigest md = MessageDigest.getInstance("SHA-256");
                 md.update(hashattava.getBytes());
@@ -141,7 +148,22 @@ public class Main {
                     hexString.append(hex);
                 }
                 if (kayttaja.getHash().equals(hexString.toString())) {
-                    res.cookie("login", req.queryParams("kayttajanimi") + " " + hexString.toString());
+
+                    // Luodaan loginille random String ja varmistetaan ettei samaa Stringiä ole jo jollain käyttäjällä tietokannassa
+                    String login = genSalt(128);
+                    List<String> loginit = new ArrayList<>();
+                    for (Kayttaja kayttajaFor : kd.findAll()) {
+                        if (kayttajaFor.getLogin() != null) {
+                            loginit.add(kayttajaFor.getLogin());
+                        }
+                    }
+                    while (loginit.contains(login)) {
+                        login = genSalt(128);
+                    }
+
+                    res.cookie("login", login, 60*60*24);
+                    kd.login(kd.findOne(req.queryParams("kayttajanimi")).getId(), login);
+                    System.out.println("Käyttäjä kirjattu sisään");
                     res.redirect("/");
                     return "kirjauduttu käyttäjällä " + req.queryParams("kayttajanimi");
                 }
@@ -151,7 +173,10 @@ public class Main {
 
         get("/logout", (req, res) -> {
 
+            kd.login(kd.findWithLogin(req.cookie("login")).getId(), "0");
+            System.out.println("Käyttäjä kirjattu ulos (tietokanta)");
             res.removeCookie("login");
+            System.out.println("Käyttäjä kirjattu ulos (cookie)");
             res.redirect("/");
             return "ok";
         });
@@ -198,11 +223,13 @@ public class Main {
 
                 // Ja lopuksi luodaan käyttäjä ja muunnetaan hexString Stringiksi :)
                 kd.create(req.queryParams("kayttajanimi"), salt, hexString.toString());
+                System.out.println("Käyttäjän luominen onnistui");
 
                 res.redirect("/");
                 return "ok";
 
             } else {
+                System.out.println("Käyttäjää ei luotu");
                 return "Error (Onko käyttäjänimi jo varattu?)";
 
             }
@@ -220,5 +247,14 @@ public class Main {
         }
         return sb.toString();
     }
+    
+    public static String loginCheckNimi(List<Kayttaja> kayttajat, String cookie) {
 
+        for (Kayttaja kayttaja : kayttajat) {
+            if (kayttaja.getLogin().equals(cookie)) {
+                return kayttaja.getNimimerkki();
+            }
+        }
+        return "null";
+    }
 }

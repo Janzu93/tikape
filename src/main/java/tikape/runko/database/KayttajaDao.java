@@ -19,7 +19,8 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
     public KayttajaDao(Database database) {
         this.database = database;
     }
-
+    
+    // Etsi ID:llä Kayttaja
     @Override
     public Kayttaja findOne(Integer key) throws SQLException {
         Connection connection = database.getConnection();
@@ -37,8 +38,9 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
         String salt = rs.getString("salt");
         String hash = rs.getString("hash");
         Integer tyyppi = rs.getInt("tyyppi");
+        String login = rs.getString("login");
 
-        Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi);
+        Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi, login);
 
         rs.close();
         stmt.close();
@@ -46,7 +48,8 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
 
         return kayttaja;
     }
-
+    
+    // Etsi nimellä käyttäjä
     public Kayttaja findOne(String key) throws SQLException {
         Connection connection = database.getConnection();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Kayttaja WHERE nimimerkki = ?;");
@@ -63,8 +66,9 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
         String salt = rs.getString("salt");
         String hash = rs.getString("hash");
         Integer tyyppi = rs.getInt("tyyppi");
+        String login = rs.getString("login");
 
-        Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi);
+        Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi, login);
 
         rs.close();
         stmt.close();
@@ -72,6 +76,34 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
 
         return kayttaja;
     }
+        public Kayttaja findWithLogin(String key) throws SQLException {
+        Connection connection = database.getConnection();
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Kayttaja WHERE login = ?;");
+        stmt.setObject(1, key);
+
+        ResultSet rs = stmt.executeQuery();
+        boolean hasOne = rs.next();
+        if (!hasOne) {
+            return null;
+        }
+
+        Integer id = rs.getInt("id");
+        String nimi = rs.getString("nimimerkki");
+        String salt = rs.getString("salt");
+        String hash = rs.getString("hash");
+        Integer tyyppi = rs.getInt("tyyppi");
+        String login = rs.getString("login");
+
+        Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi, login);
+
+        rs.close();
+        stmt.close();
+        connection.close();
+
+        return kayttaja;
+    }
+    
+    
 
     @Override
     public List<Kayttaja> findAll() throws SQLException {
@@ -87,8 +119,10 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
             String salt = rs.getString("salt");
             String hash = rs.getString("hash");
             Integer tyyppi = rs.getInt("tyyppi");
+            String login = rs.getString("login");
 
-            Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi);
+            Kayttaja kayttaja = new Kayttaja(id, nimi, salt, hash, tyyppi, login);
+            kayttajat.add(kayttaja);
         }
 
         rs.close();
@@ -120,6 +154,16 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
         stmt.execute();
         conn.close();
 
+    }
+    
+    public void login(Integer id, String login) throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("UPDATE Kayttaja SET login = ? WHERE id = ?");
+        stmt.setObject(1, login);
+        stmt.setObject(2, id);
+        
+        stmt.execute();
+        conn.close();
     }
 
 }

@@ -11,9 +11,18 @@ public class Kayttaja {
     private String hash;
     private String salt;
     private Integer tyyppi;
+    private String login;
 
     public String getHash() {
         return hash;
+    }
+
+    public String getLogin() {
+        return login;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public void setHash(String hash) {
@@ -36,12 +45,13 @@ public class Kayttaja {
         this.tyyppi = tyyppi;
     }
 
-    public Kayttaja(Integer id, String nimimerkki, String salt, String hash, Integer tyyppi) {
+    public Kayttaja(Integer id, String nimimerkki, String salt, String hash, Integer tyyppi, String login) {
         this.id = id;
         this.nimimerkki = nimimerkki;
         this.hash = hash;
         this.salt = salt;
         this.tyyppi = tyyppi;
+        this.login = login;
     }
 
 

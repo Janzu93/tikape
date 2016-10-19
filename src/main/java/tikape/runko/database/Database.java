@@ -57,12 +57,15 @@ public class Database {
         // salasanan tarkistus toteutetaan hyödyntäen vertailua "Syötettysalasana"+salt = salasana tietokannasta
         // Jos merkkijonot täsmää voidaan olettaa käyttäjän syöttäneen sama salasana (koska hashayksen tulos muuttuu salasanan muuttuessa)
         // Esim. Salasana=qwerty123 ja suola(random generoitu)=a4d niin hash luodaan cryptaamalla merkkijono qwerty123a4d
+        
+        // Käyttäjän tietokannassa oleva sarake "login" tallentaa 128bit merkkijonon jota käytetään estämään kirjautumisen väärentäminen cookieta muokkaamalla
         lista.add("CREATE TABLE Kayttaja (\n"
                 + "ID integer PRIMARY KEY AUTOINCREMENT,\n"
                 + "nimimerkki varchar,\n"
                 + "salt varchar,\n"
                 + "hash varchar,\n"
-                + "tyyppi integer\n"
+                + "tyyppi integer,\n"
+                + "login varchar\n"
                 + ");");
 
         lista.add("CREATE TABLE Aihealue (\n"
