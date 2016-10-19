@@ -11,8 +11,9 @@
         <ul>
             <li th:each="ketju : ${ketjut}">
                 <a th:href="@{~/ketju/{id}(id=${ketju.id})}">
-                    <span th:text="${ketju.otsikko}">Viestien otsikot</span>
+                    <span th:text="${ketju.otsikko}">Viestiketjujen otsikot</span>
                 </a>
+                <span>Viestejä ketjussa: </span><span th:text="${ketju.lkm}"></span>
                 <form th:action="@{~/ketju/{id}/delete(id=${ketju.id})}" method="POST">
                     <input type="submit" value="Poista"/>
                 </form>

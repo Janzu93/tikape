@@ -13,6 +13,7 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import spark.Spark;
 import tikape.runko.domain.Kayttaja;
 
 public class Main {
@@ -20,17 +21,18 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         Database database = new Database("jdbc:sqlite:forum.db");
-        database.init();
+//        database.init();
         AihealueDao ad = new AihealueDao(database);
         ViestiketjuDao vkd = new ViestiketjuDao(database);
         ViestiDao vd = new ViestiDao(database);
         KayttajaDao kd = new KayttajaDao(database);
-        // Boolean kirjautunut = false; ?
-
+        
+        
         // asetetaan portti jos heroku antaa PORT-ympäristömuuttujan
         if (System.getenv("PORT") != null) {
             port(Integer.valueOf(System.getenv("PORT")));
         }
+        
 
         // Etusivu - Listaa aihealueet
         get("/", (req, res) -> {
@@ -69,7 +71,7 @@ public class Main {
         // Listaa aihealueen kaikki viestiketjut
         get("/aihealue/:id", (req, res) -> {
             HashMap data = new HashMap<>();
-            data.put("ketjut", vkd.findAll(Integer.parseInt(req.params(":id"))));
+            data.put("ketjut", vkd.findAllWithLkm(Integer.parseInt(req.params(":id"))));
             data.put("otsikko", ad.findOne(Integer.parseInt(req.params(":id"))).getOtsikko());
 
             return new ModelAndView(data, "aihealue");

@@ -14,6 +14,11 @@ public class Aihealue {
     private Integer id;
     private String otsikko;
 
+    public Aihealue(Integer id, String otsikko, Integer viestiLkm) {
+        this.id = id;
+        this.otsikko = otsikko;
+    }
+
     public Integer getId() {
         return id;
     }

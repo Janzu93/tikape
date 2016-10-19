@@ -19,7 +19,7 @@
         </ul>
         
         <form method="POST">
-            <input type="text" name="teksti"/>
+            <textarea rows="10" cols="50" name="teksti"/>
             <input type="submit" value="Uusi viesti"/>
         </form>
         <a th:href="@{~/aihealue/{id}(id=${aihealueId})}">

@@ -87,6 +87,28 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
 
         return viestiketjut;
     }
+    
+        public List<Viestiketju> findAllWithLkm(int aihealueId) throws SQLException {
+
+        Connection connection = database.getConnection();
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?;");
+        stmt.setObject(1, aihealueId);
+
+        ResultSet rs = stmt.executeQuery();
+        List<Viestiketju> viestiketjut = new ArrayList<>();
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            String nimi = rs.getString("otsikko");
+            Integer lkm = countViestit(id);
+            viestiketjut.add(new Viestiketju(id, nimi, lkm));
+        }
+
+        rs.close();
+        stmt.close();
+        connection.close();
+
+        return viestiketjut;
+    }
 
     @Override
     public void delete(Integer key) throws SQLException {
@@ -144,7 +166,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         return id;
     }
 
-    // Tämän metodin pitäisi toimia, miten hyödynnetään viestien laskussa? Kokeilin onneani - Ei toiminut :P
+    // Tämän metodin pitäisi toimia, miten hyödynnetään viestien laskussa
     public int countViestit(int vkId) throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) AS lkm FROM Viesti WHERE Viesti.viestiketju_id = ?");
