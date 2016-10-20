@@ -48,7 +48,7 @@ public class Database {
         lista.add("CREATE TABLE Viesti (\n"
                 + "ID integer PRIMARY KEY AUTOINCREMENT,\n"
                 + "teksti varchar,\n"
-                + "aika timestamp,\n"
+                + "aika DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
                 + "viestiketju_id integer,\n"
                 + "kayttaja_id integer\n"
                 + ");");

@@ -5,7 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import tikape.runko.domain.Viesti;
 import tikape.runko.domain.Viestiketju;
 
 /**
@@ -35,7 +37,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         Integer id = rs.getInt("id");
         String nimi = rs.getString("otsikko");
 
-        Viestiketju kayttaja = new Viestiketju(id, nimi);
+        Viestiketju kayttaja = new Viestiketju(id, nimi, countViestit(id), getNewestPost(id));
 
         rs.close();
         stmt.close();
@@ -56,7 +58,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
             Integer id = rs.getInt("id");
             String nimi = rs.getString("otsikko");
 
-            viestiketjut.add(new Viestiketju(id, nimi));
+            viestiketjut.add(new Viestiketju(id, nimi, countViestit(id), getNewestPost(id)));
         }
 
         rs.close();
@@ -78,7 +80,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
             Integer id = rs.getInt("id");
             String nimi = rs.getString("otsikko");
 
-            viestiketjut.add(new Viestiketju(id, nimi));
+            viestiketjut.add(new Viestiketju(id, nimi, countViestit(id), getNewestPost(id)));
         }
 
         rs.close();
@@ -88,7 +90,8 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         return viestiketjut;
     }
     
-        public List<Viestiketju> findAllWithLkm(int aihealueId) throws SQLException {
+    // palauttaa sortattuna uusimpien viestien perusteella
+    public List<Viestiketju> findAllFromAihealue(int aihealueId) throws SQLException {
 
         Connection connection = database.getConnection();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?;");
@@ -99,14 +102,15 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         while (rs.next()) {
             Integer id = rs.getInt("id");
             String nimi = rs.getString("otsikko");
-            Integer lkm = countViestit(id);
-            viestiketjut.add(new Viestiketju(id, nimi, lkm));
+            viestiketjut.add(new Viestiketju(id, nimi, countViestit(id), getNewestPost(id)));
         }
 
         rs.close();
         stmt.close();
         connection.close();
 
+        // sortataan sen mukaan milloin uusin viesti on tullut. kai tän vois tehä SQL:ssäkin, mä_en_osaa
+        viestiketjut.sort(Comparator.comparing(ketju -> ketju.getUusinViesti().getAika(), Comparator.reverseOrder()));
         return viestiketjut;
     }
 
@@ -181,6 +185,29 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         stmt.close();
         conn.close();
         return viestiLkm;
+    }
+    
+    private Viesti getNewestPost(int ketjuId)  throws SQLException  {
+        Connection conn = database.getConnection();
+      
+        // tää hakee kaikki 'ketjuID' kuuluvat viestit, sorttaa ne ajan mukaan ja palauttaa vaan uusimman ('LIMIT 1')
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Viestiketju, Viesti WHERE Viesti.viestiketju_id = Viestiketju.id AND Viestiketju.id = ? ORDER BY Viesti.aika DESC LIMIT 1");
+        stmt.setObject(1, ketjuId);
+
+        ResultSet rs = stmt.executeQuery();
+        Integer viestiID = -1;
+        String teksti = "";
+        String aika = "";
+
+        while (rs.next()) {
+            viestiID = rs.getInt("id");
+            teksti = rs.getString("teksti");
+            aika = rs.getString("aika");
+        }
+        
+        stmt.close();
+        conn.close();
+        return new Viesti(viestiID, teksti, aika);
     }
 
 }

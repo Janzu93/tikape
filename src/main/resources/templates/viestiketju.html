@@ -29,7 +29,7 @@
             <li th:each="viesti : ${viestit}">
                 <span class="column-1-long" th:text="${viesti.teksti}"></span>
                 <span class="column-2" th:text="${'**viestin lahettaja**'}"></span>
-                <span class="column-3" th:text="${'**aika**'}"></span>
+                <span class="column-3" th:text="${viesti.aika}"></span>
                 
                 <form class="column-4" th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
                     <input type="submit" value="Poista"/>

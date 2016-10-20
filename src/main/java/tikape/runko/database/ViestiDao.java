@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import tikape.runko.domain.Viesti;
@@ -79,9 +80,9 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         while (rs.next()) {
             Integer id = rs.getInt("id");
             String teksti = rs.getString("teksti");
-//            String aika = rs.getTimestamp("aika").toString();
+            String aika = rs.getString("aika");
 
-            viestit.add(new Viesti(id, teksti, "12121321"));
+            viestit.add(new Viesti(id, teksti, (aika == null) ? "aika on null" : aika));
         }
 
         rs.close();

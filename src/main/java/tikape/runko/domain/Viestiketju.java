@@ -8,25 +8,22 @@ public class Viestiketju {
     
     private Integer id;
     private String otsikko;
-    private Integer lkm;
+    private Integer viestienLkm;
+    private Viesti uusinViesti;
 
-    public Viestiketju(Integer id, String otsikko, Integer lkm) {
+    public Viestiketju(Integer id, String otsikko, Integer viestienLkm, Viesti uusinViesti) {
         this.id = id;
         this.otsikko = otsikko;
-        this.lkm = lkm;
+        this.viestienLkm = viestienLkm;
+        this.uusinViesti = uusinViesti;
     }
 
-    public Viestiketju(Integer id, String otsikko) {
-        this.id = id;
-        this.otsikko = otsikko;
+    public Integer getViestienLkm() {
+        return viestienLkm;
     }
 
-    public Integer getLkm() {
-        return lkm;
-    }
-
-    public void setLkm(Integer lkm) {
-        this.lkm = lkm;
+    public void setViestienLkm(Integer lkm) {
+        this.viestienLkm = viestienLkm;
     }
 
     public Integer getId() {
@@ -43,6 +40,10 @@ public class Viestiketju {
 
     public void setOtsikko(String otsikko) {
         this.otsikko = otsikko;
+    }
+    
+    public Viesti getUusinViesti() {
+        return uusinViesti;
     }
     
 }

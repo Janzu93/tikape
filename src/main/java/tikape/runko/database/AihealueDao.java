@@ -36,7 +36,7 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         Integer id = rs.getInt("id");
         String nimi = rs.getString("otsikko");
 
-        Aihealue aihealue = new Aihealue(id, nimi);
+        Aihealue aihealue = new Aihealue(id, nimi, calculatePostCount(id));
 
         rs.close();
         stmt.close();
@@ -57,7 +57,7 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
             Integer id = rs.getInt("id");
             String nimi = rs.getString("otsikko");
 
-            aihealueet.add(new Aihealue(id, nimi));
+            aihealueet.add(new Aihealue(id, nimi, calculatePostCount(id)));
         }
 
         rs.close();
@@ -92,6 +92,21 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         stmt.close();
         conn.close();
 
+    }
+    
+    public int calculatePostCount(Integer key) throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(Viesti.id) as postCount FROM Viestiketju, Viesti WHERE Viesti.viestiketju_id = Viestiketju.id AND Viestiketju.aihealue_id = ?");
+        stmt.setObject(1, key);
+         
+        ResultSet rs = stmt.executeQuery();
+        Integer count = rs.next() ? rs.getInt("postCount") : 0;
+
+        rs.close();
+        stmt.close();
+        conn.close();
+
+        return count;
     }
 
     public void create(String nimi) throws SQLException {

@@ -6,13 +6,15 @@ package tikape.runko.domain;
  */
 public class Aihealue {
 
-    public Aihealue(Integer id, String otsikko) {
+    public Aihealue(Integer id, String otsikko, int viestienLukumaara) {
         this.id = id;
         this.otsikko = otsikko;
+        this.viestienLukumaara = viestienLukumaara;
     }
     
     private Integer id;
     private String otsikko;
+    private Integer viestienLukumaara;
 
     public Aihealue(Integer id, String otsikko, Integer viestiLkm) {
         this.id = id;
@@ -33,6 +35,10 @@ public class Aihealue {
 
     public void setOtsikko(String otsikko) {
         this.otsikko = otsikko;
+    }
+    
+    public Integer getViestienLukumaara() {
+        return viestienLukumaara;
     }
     
 }

@@ -24,7 +24,7 @@
             <li th:each="aihealue : ${aihealueet}">
 
                 <a class="column-1" th:href="@{~/aihealue/{id}(id=${aihealue.id})}" th:text="${aihealue.otsikko}"></a>
-                <span class="column-2" th:text="${'**viestin lkm**'}"></span>
+                <span class="column-2" th:text="${aihealue.viestienLukumaara}"></span>
                 <span class="column-3" th:text="${'**viimeisin viesti**'}"></span>
                 <form class="column-4" th:action="@{~/aihealue/{id}/delete(id=${aihealue.id})}" method="POST">
                     <input type="submit" value="Poista"/>

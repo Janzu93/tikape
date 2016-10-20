@@ -20,7 +20,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         Database database = new Database("jdbc:sqlite:forum.db");
-//        database.init();
+       // database.init();
         AihealueDao ad = new AihealueDao(database);
         ViestiketjuDao vkd = new ViestiketjuDao(database);
         ViestiDao vd = new ViestiDao(database);
@@ -73,7 +73,7 @@ public class Main {
         // Listaa aihealueen kaikki viestiketjut
         get("/aihealue/:id", (req, res) -> {
             HashMap data = new HashMap<>();
-            data.put("ketjut", vkd.findAllWithLkm(Integer.parseInt(req.params(":id"))));
+            data.put("ketjut", vkd.findAllFromAihealue(Integer.parseInt(req.params(":id"))));
             data.put("aihealue", ad.findOne(Integer.parseInt(req.params(":id"))));
 
             return new ModelAndView(data, "aihealue");
