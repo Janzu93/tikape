@@ -4,21 +4,34 @@
     <head>
         <title>4umiChan</title>
         <meta charset="utf-8" />
+        
+        <!-- bootstrap. tää heittää kivat fontit noihin teksteihin, 
+             voisi ehkä ladata kivat fontit itekkin ilman että latais koko bootstrappia -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> </link>
+        <link rel="stylesheet" href="/common.css"></link>
     </head>
 
     <body>
-        <!-- Aihealueet > **AIHEALUEEN NIMI** > **VIESTIKETJUN NIMI** -->
-        <h1> <a href='/'>Aihealueet</a> 
+        <!-- Etusivu > Aihealue.otsikko > Viestiketju.otsikko -->
+        <h1> <a href='/'>Etusivu</a> 
             > 
             <a th:href='@{~/aihealue/{id}(id=${aihealue.id})}' th:text='${aihealue.otsikko}'></a> 
             > 
-            <a th:text="${ketju.otsikko}"> </a> 
+            <span th:text="${ketju.otsikko}"> </span> 
         </h1>
         
+        <!-- Halutaanko erilainen layout näille viesteille ? -->
+        
+        <strong class="column-1-long">Viesti</strong>
+        <strong class="column-2">Lahettaja</strong>
+        <strong class="column-3">Aika</strong>
         <ul>
             <li th:each="viesti : ${viestit}">
-                <span th:text="${viesti.teksti}">Tässä on viestin teksti</span>
-                <form th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
+                <span class="column-1-long" th:text="${viesti.teksti}"></span>
+                <span class="column-2" th:text="${'**viestin lahettaja**'}"></span>
+                <span class="column-3" th:text="${'**aika**'}"></span>
+                
+                <form class="column-4" th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
                     <input type="submit" value="Poista"/>
                 </form>
             </li>

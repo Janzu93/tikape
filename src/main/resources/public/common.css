@@ -1,0 +1,50 @@
+ .column-1 {
+    width: 200px;
+    display: inline-block;
+}
+
+.column-1-long {
+    width: 300px;
+    display: inline-block;
+}
+
+
+.column-2 {
+    width: 200px;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+.column-3 {
+    width: 160px;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+ .column-4 {
+    width: 60px;
+    display: inline-block;
+    margin-left: 8px;
+}
+
+body {
+    margin: 16px;
+}
+
+ul {
+    padding-left: 0px; 
+    list-style-type: none;
+    margin-bottom: 32px;
+}
+
+h1 {
+    font-size: 28px; 
+}
+
+h1 > span a {
+    font-size: 28px;
+}
+
+h2 {
+    font-size: 24px;
+}

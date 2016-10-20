@@ -4,21 +4,30 @@
     <head>
         <title>4umiChan</title>
         <meta charset="utf-8" />
+        
+        <!-- bootstrap. tää heittää kivat fontit noihin teksteihin, 
+             voisi ehkä ladata kivat fontit itekkin ilman että latais koko bootstrappia -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> </link>
+        <link rel="stylesheet" href="/common.css"></link>
+      
     </head>
 
     <body>
-         <!-- Aihealueet > **AIHEALUEEN NIMI**  -->
+         <!-- Etusivu > Aihealue.otsikko  -->
         <h1> 
-            <a href='/'>Aihealueet</a> > <a th:text="${aihealue.otsikko}"></a>
+            <a href='/'>Etusivu</a> > <span th:text="${aihealue.otsikko}"></span>
         </h1>
+         
+        <strong class="column-1">Otsikko</strong>
+        <strong class="column-2">Viestien lukumaara</strong>
+        <strong class="column-3">Uusin viesti </strong>
         
         <ul>
-            <li th:each="ketju : ${ketjut}">
-                <a th:href="@{~/ketju/{id}(id=${ketju.id})}">
-                    <span th:text="${ketju.otsikko}">Viestiketjujen otsikot</span>
-                </a>
-                <span>Viestejä ketjussa: </span><span th:text="${ketju.lkm}"></span>
-                <form th:action="@{~/ketju/{id}/delete(id=${ketju.id})}" method="POST">
+            <li th:each="ketju : ${ketjut}" style="display: block">
+                <a class="column-1" th:href="@{~/ketju/{id}(id=${ketju.id})}" th:text='${ketju.otsikko}'> </a>
+                <span class="column-2" th:text="${ketju.lkm}"></span>
+                <span class="column-3" th:text="${'Uusin viesti: XXX'}"></span>
+                <form class="column-4" th:action="@{~/ketju/{id}/delete(id=${ketju.id})}" method="POST">
                     <input type="submit" value="Poista"/>
                 </form>
             </li>

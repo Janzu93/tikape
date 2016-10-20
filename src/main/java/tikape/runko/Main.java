@@ -13,7 +13,6 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import spark.Spark;
 import tikape.runko.domain.Kayttaja;
 
 public class Main {
@@ -33,6 +32,8 @@ public class Main {
             port(Integer.valueOf(System.getenv("PORT")));
         }
         
+        // aseta sijainti css -tiedostoja varten
+        staticFileLocation ("/public");
 
         // Etusivu - Listaa aihealueet
         get("/", (req, res) -> {
