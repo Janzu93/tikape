@@ -7,7 +7,11 @@
     </head>
 
     <body>
-        <h1 th:text="${otsikko}"></h1>
+         <!-- Aihealueet > **AIHEALUEEN NIMI**  -->
+        <h1> 
+            <a href='/'>Aihealueet</a> > <a th:text="${aihealue.otsikko}"></a>
+        </h1>
+        
         <ul>
             <li th:each="ketju : ${ketjut}">
                 <a th:href="@{~/ketju/{id}(id=${ketju.id})}">
@@ -24,8 +28,5 @@
             <input type="text" name="otsikko"/>
             <input type="submit" value="Uusi viestiketju"/>
         </form>
-        <a href = "/">
-            <span>Takaisin edelliselle sivulle</span>
-        </a>
     </body>
 </html>

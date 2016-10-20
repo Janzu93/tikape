@@ -51,6 +51,7 @@ public class Main {
                 }
 
             }
+            
             data.put("login", "Et ole kirjautunut sisään!");
             return new ModelAndView(data, "index");
         }, new ThymeleafTemplateEngine());
@@ -72,7 +73,7 @@ public class Main {
         get("/aihealue/:id", (req, res) -> {
             HashMap data = new HashMap<>();
             data.put("ketjut", vkd.findAllWithLkm(Integer.parseInt(req.params(":id"))));
-            data.put("otsikko", ad.findOne(Integer.parseInt(req.params(":id"))).getOtsikko());
+            data.put("aihealue", ad.findOne(Integer.parseInt(req.params(":id"))));
 
             return new ModelAndView(data, "aihealue");
         }, new ThymeleafTemplateEngine());
@@ -95,8 +96,8 @@ public class Main {
         get("/ketju/:ketjuid", (req, res) -> {
             HashMap data = new HashMap<>();
             data.put("viestit", vd.findAll(Integer.parseInt(req.params(":ketjuid"))));
-            data.put("otsikko", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))).getOtsikko());
-            data.put("aihealueId", vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))));
+            data.put("ketju", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))));
+            data.put("aihealue", ad.findOne(vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))))); // hakee Aihealue-objektin
 
             return new ModelAndView(data, "viestiketju");
         }, new ThymeleafTemplateEngine());

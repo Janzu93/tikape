@@ -7,7 +7,14 @@
     </head>
 
     <body>
-        <h1 th:text ="${otsikko}"></h1>
+        <!-- Aihealueet > **AIHEALUEEN NIMI** > **VIESTIKETJUN NIMI** -->
+        <h1> <a href='/'>Aihealueet</a> 
+            > 
+            <a th:href='@{~/aihealue/{id}(id=${aihealue.id})}' th:text='${aihealue.otsikko}'></a> 
+            > 
+            <a th:text="${ketju.otsikko}"> </a> 
+        </h1>
+        
         <ul>
             <li th:each="viesti : ${viestit}">
                 <span th:text="${viesti.teksti}">Tässä on viestin teksti</span>
@@ -22,8 +29,5 @@
             <textarea rows="10" cols="50" name="teksti"/>
             <input type="submit" value="Uusi viesti"/>
         </form>
-        <a th:href="@{~/aihealue/{id}(id=${aihealueId})}">
-                    <span>Takaisin edelliselle sivulle</span>
-                </a>
     </body>
 </html>
