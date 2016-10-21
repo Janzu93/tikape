@@ -20,7 +20,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
 
         Database database = new Database("jdbc:sqlite:forum.db");
-       // database.init();
+//        database.init();
         AihealueDao ad = new AihealueDao(database);
         ViestiketjuDao vkd = new ViestiketjuDao(database);
         ViestiDao vd = new ViestiDao(database);
@@ -106,9 +106,9 @@ public class Main {
             
             if (!loginCheckNimi(kd.findAll(), req.cookie("login")).equals("null")) {
                 String nimimerkki = loginCheckNimi(kd.findAll(), req.cookie("login"));
-                vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), "aika", kd.findOne(nimimerkki).getId());
+                vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), kd.findOne(nimimerkki).getId());
             } else {
-                vd.create("Guest", Integer.parseInt(req.params(":ketjuid")), "aika", 0);
+                vd.create("Guest", Integer.parseInt(req.params(":ketjuid")), 0);
             }
 
             res.redirect("/ketju/" + req.params(":ketjuid"));

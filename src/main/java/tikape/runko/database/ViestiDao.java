@@ -140,13 +140,12 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         conn.close();
     }
 
-    public void create(String nimi, int ketjuId, String aika, int kayttajaId) throws SQLException {
+    public void create(String nimi, int ketjuId, int kayttajaId) throws SQLException {
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Viesti(teksti, viestiketju_id, aika, kayttaja_id) VALUES(?, ?, ?, ?)");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Viesti(teksti, viestiketju_id, kayttaja_id) VALUES(?, ?, ?)");
         stmt.setObject(1, nimi);
         stmt.setObject(2, ketjuId);
-        stmt.setObject(3, aika);
-        stmt.setObject(4, kayttajaId);
+        stmt.setObject(3, kayttajaId);
 
         stmt.execute();
         stmt.close();
