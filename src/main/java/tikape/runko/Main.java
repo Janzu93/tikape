@@ -108,7 +108,7 @@ public class Main {
                 String nimimerkki = loginCheckNimi(kd.findAll(), req.cookie("login"));
                 vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), "aika", kd.findOne(nimimerkki).getId());
             } else {
-                vd.create("Guest", Integer.parseInt(req.params(":ketjuid")), "aika", -2);
+                vd.create("Guest", Integer.parseInt(req.params(":ketjuid")), "aika", 0);
             }
 
             res.redirect("/ketju/" + req.params(":ketjuid"));
