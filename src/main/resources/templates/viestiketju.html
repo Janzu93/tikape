@@ -52,5 +52,15 @@
 
         </ul>
 
+        <ul>
+            <li th:each="sivu: ${#numbers.sequence(1, sivumaara)}" style="display: inline-block">
+                <a th:href="@{~/ketju/{id}?sivu={sivu}(id=${ketju.id}, sivu=${sivu})}" th:text="${sivu}"></a>
+            </li>
+        </ul>
+        
+        <form method="POST">
+            <textarea rows="10" cols="50" name="teksti"/>
+            <input type="submit" value="Uusi viesti"/>
+        </form>
     </body>
 </html>
