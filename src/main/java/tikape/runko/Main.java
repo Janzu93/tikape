@@ -25,15 +25,14 @@ public class Main {
         ViestiketjuDao vkd = new ViestiketjuDao(database);
         ViestiDao vd = new ViestiDao(database);
         KayttajaDao kd = new KayttajaDao(database);
-        
-        
+
         // asetetaan portti jos heroku antaa PORT-ympäristömuuttujan
         if (System.getenv("PORT") != null) {
             port(Integer.valueOf(System.getenv("PORT")));
         }
-        
+
         // aseta sijainti css -tiedostoja varten
-        staticFileLocation ("/public");
+        staticFileLocation("/public");
 
         // Etusivu - Listaa aihealueet
         get("/", (req, res) -> {
@@ -41,7 +40,7 @@ public class Main {
             data.put("aihealueet", ad.findAll());
 
             if (req.cookie("login") != null) {
-                
+
                 String nimi = loginCheckNimi(kd.findAll(), req.cookie("login"));
                 if (!nimi.equals("null")) {
                     data.put("login", "Tervetuloa " + nimi);
@@ -50,7 +49,7 @@ public class Main {
                 }
 
             }
-            
+
             data.put("login", "Et ole kirjautunut sisään!");
             return new ModelAndView(data, "index");
         }, new ThymeleafTemplateEngine());
@@ -72,8 +71,8 @@ public class Main {
         get("/aihealue/:id", (req, res) -> {
             HashMap data = new HashMap<>();
             Integer sivu = (req.queryParams("sivu") != null) ? Integer.parseInt(req.queryParams("sivu")) : 1;
-            Integer sivumaara = (int)Math.ceil(vkd.findAllFromAihealue(Integer.parseInt(req.params(":id"))).size() / 10.0);
-            
+            Integer sivumaara = (int) Math.ceil(vkd.findAllFromAihealue(Integer.parseInt(req.params(":id"))).size() / 10.0);
+
             data.put("ketjut", vkd.findAllFromAihealue(Integer.parseInt(req.params(":id")), (sivu - 1) * 10));
             data.put("aihealue", ad.findOne(Integer.parseInt(req.params(":id"))));
             data.put("sivumaara", sivumaara);
@@ -98,16 +97,21 @@ public class Main {
         // Listaa viestiketjun kaikki viestit
         get("/ketju/:ketjuid", (req, res) -> {
             HashMap data = new HashMap<>();
-            data.put("viestit", vd.findAllWithNimimerkki(Integer.parseInt(req.params(":ketjuid"))));
+            Integer sivu = (req.queryParams("sivu") != null) ? Integer.parseInt(req.queryParams("sivu")) : 1;
+            Integer sivumaara = (int) Math.ceil(vd.countViestit(Integer.parseInt(req.params(":ketjuid"))) / 5.0);
+            System.out.println(sivumaara);
+            
+            data.put("viestit", vd.findAllWithNimimerkki(Integer.parseInt(req.params(":ketjuid")), (sivu - 1) * 5));
             data.put("ketju", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))));
             data.put("aihealue", ad.findOne(vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))))); // hakee Aihealue-objektin
+            data.put("sivumaara", sivumaara);
 
             return new ModelAndView(data, "viestiketju");
         }, new ThymeleafTemplateEngine());
 
         // Luo uusi viesti (POST Viestiketju)
         post("/ketju/:ketjuid", (req, res) -> {
-            
+
             if (!loginCheckNimi(kd.findAll(), req.cookie("login")).equals("null")) {
                 String nimimerkki = loginCheckNimi(kd.findAll(), req.cookie("login"));
                 vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), kd.findOne(nimimerkki).getId());
@@ -173,7 +177,7 @@ public class Main {
                         login = genSalt(128);
                     }
 
-                    res.cookie("login", login, 60*60*24);
+                    res.cookie("login", login, 60 * 60 * 24);
                     kd.login(kd.findOne(req.queryParams("kayttajanimi")).getId(), login);
                     System.out.println("Käyttäjä kirjattu sisään");
                     res.redirect("/");
@@ -262,7 +266,7 @@ public class Main {
         }
         return sb.toString();
     }
-    
+
     public static String loginCheckNimi(List<Kayttaja> kayttajat, String cookie) {
         for (Kayttaja kayttaja : kayttajat) {
             if (kayttaja.getLogin() == null) {

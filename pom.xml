@@ -27,21 +27,11 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.8.11.2</version>
         </dependency>
-        <dependency>
-            <groupId>commons-net</groupId>
-            <artifactId>commons-net</artifactId>
-            <version>3.3</version>
-        </dependency>
     </dependencies>
     
     <!-- projektin käynnistäminen Herokussa -->
     <build>
         <plugins> 
-            <plugin>
-                <groupId>org.apache.commons</groupId>
-                <artifactId>commons-build-plugin</artifactId>
-                <version>1.6</version>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

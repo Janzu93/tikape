@@ -4,7 +4,7 @@
     <head>
         <title>4umiChan</title>
         <meta charset="utf-8" />
-        
+
         <!-- bootstrap. tää heittää kivat fontit noihin teksteihin, 
              voisi ehkä ladata kivat fontit itekkin ilman että latais koko bootstrappia -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> </link>
@@ -19,9 +19,9 @@
             > 
             <span th:text="${ketju.otsikko}"> </span> 
         </h1>
-        
+
         <!-- Halutaanko erilainen layout näille viesteille ? -->
-        
+
         <strong class="column-1-long">Viesti</strong>
         <strong class="column-2">Lahettaja</strong>
         <strong class="column-3">Aika</strong>
@@ -30,14 +30,19 @@
                 <span class="column-1-long" th:text="${viesti.teksti}"></span>
                 <span class="column-2" th:text="${viesti.lahettaja}"></span>
                 <span class="column-3" th:text="${viesti.aika}"></span>
-                
+
                 <form class="column-4" th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
                     <input type="submit" value="Poista"/>
                 </form>
             </li>
-            
+
         </ul>
-        
+        <ul>
+            <li th:each="sivu: ${#numbers.sequence(1, sivumaara)}" style="display: inline-block">
+                <a th:href="@{~/ketju/{id}?sivu={sivu}(id=${ketju.id}, sivu=${sivu})}" th:text="${sivu}"></a>
+            </li>
+        </ul>
+
         <form method="POST">
             <textarea rows="10" cols="50" name="teksti"/>
             <input type="submit" value="Uusi viesti"/>
