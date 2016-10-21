@@ -71,8 +71,12 @@ public class Main {
         // Listaa aihealueen kaikki viestiketjut
         get("/aihealue/:id", (req, res) -> {
             HashMap data = new HashMap<>();
-            data.put("ketjut", vkd.findAllFromAihealue(Integer.parseInt(req.params(":id"))));
+            Integer sivu = (req.queryParams("sivu") != null) ? Integer.parseInt(req.queryParams("sivu")) : 1;
+            Integer sivumaara = (int)Math.ceil(vkd.findAllFromAihealue(Integer.parseInt(req.params(":id"))).size() / 10.0);
+            
+            data.put("ketjut", vkd.findAllFromAihealue(Integer.parseInt(req.params(":id")), (sivu - 1) * 10));
             data.put("aihealue", ad.findOne(Integer.parseInt(req.params(":id"))));
+            data.put("sivumaara", sivumaara);
 
             return new ModelAndView(data, "aihealue");
         }, new ThymeleafTemplateEngine());
@@ -203,6 +207,9 @@ public class Main {
                 /*Luodaan 128 merkkiä pitkä alfanumeerinen merkkijono joka tallennetaan suolaksi
                 Tämän EI OLE pakko olla uniikki (koska hash muodostetaan salasana+salt=hash kaavalla)
                  */
+                if (req.queryParams("salasana") == null) {
+                    return "Null";
+                }
                 String salt = genSalt(128);
                 String hashattava = req.queryParams("salasana").hashCode() + salt;
 
@@ -258,6 +265,9 @@ public class Main {
     
     public static String loginCheckNimi(List<Kayttaja> kayttajat, String cookie) {
         for (Kayttaja kayttaja : kayttajat) {
+            if (kayttaja.getLogin() == null) {
+                return "null";
+            }
             if (kayttaja.getLogin().equals(cookie)) {
                 return kayttaja.getNimimerkki();
             }
