@@ -4,7 +4,7 @@
     <head>
         <title>4umiChan</title>
         <meta charset="utf-8" />
-        
+
         <!-- bootstrap. tää heittää kivat fontit noihin teksteihin, 
              voisi ehkä ladata kivat fontit itekkin ilman että latais koko bootstrappia -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> </link>
@@ -19,25 +19,38 @@
             > 
             <span th:text="${ketju.otsikko}"> </span> 
         </h1>
-        
+
         <!-- Halutaanko erilainen layout näille viesteille ? -->
-        
+
         <strong class="column-1-long">Viesti</strong>
         <strong class="column-2">Lahettaja</strong>
         <strong class="column-3">Aika</strong>
         <ul>
             <li th:each="viesti : ${viestit}">
-                <span class="column-1-long" th:text="${viesti.teksti}"></span>
-                <span class="column-2" th:text="${viesti.lahettaja}"></span>
-                <span class="column-3" th:text="${viesti.aika}"></span>
-                
-                <form class="column-4" th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
-                    <input type="submit" value="Poista"/>
-                </form>
+                <div id="viesti">
+                    <div id="viesti-ylaosa">
+                        <div id="viesti-lahettaja">
+                            <span th:text="${viesti.lahettaja}"></span>
+                        </div>                        
+                        <div id="viesti-poista">
+                            <form th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
+                                <input type="submit" value="Poista"/>
+                            </form>
+                        </div>
+                        <div id="viesti-aika">
+                            <span th:text="${viesti.aika}"></span>                            
+                        </div>
+                    </div>
+                    <div id="viesti-teksti">
+                        <span th:text="${viesti.teksti}"></span>
+                    </div>
+
+                </div>
+
             </li>
-            
+
         </ul>
-        
+
         <form method="POST">
             <textarea rows="10" cols="50" name="teksti"/>
             <input type="submit" value="Uusi viesti"/>

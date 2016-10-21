@@ -1,4 +1,4 @@
- .column-1 {
+.column-1 {
     width: 200px;
     display: inline-block;
 }
@@ -21,7 +21,7 @@
     margin-left: 8px;
 }
 
- .column-4 {
+.column-4 {
     width: 60px;
     display: inline-block;
     margin-left: 8px;
@@ -47,4 +47,35 @@ h1 > span a {
 
 h2 {
     font-size: 24px;
+}
+
+#viesti {
+    border: 1px solid;
+    margin: 5px;
+}
+
+#viesti-ylaosa {
+    border: 1px solid;
+    position: relative;
+    height: 32px;
+}
+
+#viesti-lahettaja {
+    float: left;
+    padding: 4px;
+    vertical-align: middle;
+}
+
+#viesti-aika {
+    float: right;
+    padding: 4px;
+    vertical-align: middle;
+}
+
+#viesti-teksti {
+    padding: 8px;
+}
+
+#viesti-poista {
+    float: right;
 }
