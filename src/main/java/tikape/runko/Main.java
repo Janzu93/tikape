@@ -42,9 +42,7 @@ public class Main {
 
             if (req.cookie("login") != null) {
                 
-                List<Kayttaja> kayttajat = kd.findAll();
-                
-                String nimi = loginCheckNimi(kayttajat, req.cookie("login"));
+                String nimi = loginCheckNimi(kd.findAll(), req.cookie("login"));
                 if (!nimi.equals("null")) {
                     data.put("login", "Tervetuloa " + nimi);
                     System.out.println("Käyttäjä tunnistettu onnistuneesti");
@@ -96,7 +94,7 @@ public class Main {
         // Listaa viestiketjun kaikki viestit
         get("/ketju/:ketjuid", (req, res) -> {
             HashMap data = new HashMap<>();
-            data.put("viestit", vd.findAll(Integer.parseInt(req.params(":ketjuid"))));
+            data.put("viestit", vd.findAllWithNimimerkki(Integer.parseInt(req.params(":ketjuid"))));
             data.put("ketju", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))));
             data.put("aihealue", ad.findOne(vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))))); // hakee Aihealue-objektin
 
@@ -105,7 +103,13 @@ public class Main {
 
         // Luo uusi viesti (POST Viestiketju)
         post("/ketju/:ketjuid", (req, res) -> {
-            vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")));
+            
+            if (!loginCheckNimi(kd.findAll(), req.cookie("login")).equals("null")) {
+                String nimimerkki = loginCheckNimi(kd.findAll(), req.cookie("login"));
+                vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), "aika", kd.findOne(nimimerkki).getId());
+            } else {
+                vd.create("Guest", Integer.parseInt(req.params(":ketjuid")), "aika", -2);
+            }
 
             res.redirect("/ketju/" + req.params(":ketjuid"));
             return "ok";
@@ -117,7 +121,7 @@ public class Main {
             vd.delete(Integer.parseInt(req.params(":id")));
 
             // Teoriassa: jos poistaa viestiketjun viimeisen viestin, uudelleen ohjaa alkusivulle
-            // Jos poistaa viimeisen viestin ketjusta niin eikö ketjukin kuulu poistua?
+            // Jos poistaa viimeisen viestin ketjusta poistetaan myös ketju
             if (vkd.countViestit(ketjuId) > 0) {
                 res.redirect("/ketju/" + ketjuId);
             } else {
@@ -253,7 +257,6 @@ public class Main {
     }
     
     public static String loginCheckNimi(List<Kayttaja> kayttajat, String cookie) {
-
         for (Kayttaja kayttaja : kayttajat) {
             if (kayttaja.getLogin().equals(cookie)) {
                 return kayttaja.getNimimerkki();

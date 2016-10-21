@@ -8,6 +8,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import tikape.runko.domain.Viesti;
+import tikape.runko.database.KayttajaDao;
 
 /**
  *
@@ -24,7 +25,7 @@ public class ViestiDao implements Dao<Viesti, Integer> {
     @Override
     public Viesti findOne(Integer key) throws SQLException {
         Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE id = ?;");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti LEFT JOIN Kayttaja ON Kayttaja.id = Viesti.kayttaja_id WHERE id = ?;");
         stmt.setObject(1, key);
 
         ResultSet rs = stmt.executeQuery();
@@ -36,8 +37,9 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         Integer id = rs.getInt("id");
         String teksti = rs.getString("teksti");
         String aika = rs.getTimestamp("aika").toString();
+        Integer lahettajaId = rs.getInt("kayttaja_id");
 
-        Viesti viesti = new Viesti(id, teksti, aika);
+        Viesti viesti = new Viesti(id, teksti, aika, lahettajaId);
 
         rs.close();
         stmt.close();
@@ -50,7 +52,7 @@ public class ViestiDao implements Dao<Viesti, Integer> {
     public List<Viesti> findAll() throws SQLException {
 
         Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti;");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti LEFT JOIN Kayttaja ON Kayttaja.id");
 
         ResultSet rs = stmt.executeQuery();
         List<Viesti> viestit = new ArrayList<>();
@@ -58,8 +60,9 @@ public class ViestiDao implements Dao<Viesti, Integer> {
             Integer id = rs.getInt("id");
             String teksti = rs.getString("teksti");
             String aika = rs.getTimestamp("aika").toString();
+            Integer lahettajaId = rs.getInt("kayttaja_id");
 
-            viestit.add(new Viesti(id, teksti, aika));
+            viestit.add(new Viesti(id, teksti, aika, lahettajaId));
         }
 
         rs.close();
@@ -72,7 +75,7 @@ public class ViestiDao implements Dao<Viesti, Integer> {
     public List<Viesti> findAll(int ketjuId) throws SQLException {
 
         Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?;");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?");
         stmt.setObject(1, ketjuId);
 
         ResultSet rs = stmt.executeQuery();
@@ -81,8 +84,40 @@ public class ViestiDao implements Dao<Viesti, Integer> {
             Integer id = rs.getInt("id");
             String teksti = rs.getString("teksti");
             String aika = rs.getString("aika");
+            Integer lahettajaId = rs.getInt("kayttaja_id");
 
-            viestit.add(new Viesti(id, teksti, (aika == null) ? "aika on null" : aika));
+            viestit.add(new Viesti(id, teksti, (aika == null) ? "aika on null" : aika, lahettajaId));
+        }
+
+        rs.close();
+        stmt.close();
+        connection.close();
+
+        return viestit;
+    }
+
+    public List<Viesti> findAllWithNimimerkki(int vkid) throws SQLException {
+
+        Connection connection = database.getConnection();
+        KayttajaDao kd = new KayttajaDao(database);
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?");
+        stmt.setObject(1, vkid);
+
+        ResultSet rs = stmt.executeQuery();
+        List<Viesti> viestit = new ArrayList<>();
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            String teksti = rs.getString("teksti");
+            String aika = rs.getString("aika");
+            Integer lahettajaId = rs.getInt("kayttaja_id");
+            String lahettaja = "Guest";
+            
+            
+            if (lahettajaId != 0) {
+                lahettaja = kd.findOne(lahettajaId).getNimimerkki();
+            }
+
+            viestit.add(new Viesti(id, teksti, aika, lahettajaId, lahettaja));
         }
 
         rs.close();
@@ -105,24 +140,26 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         conn.close();
     }
 
-    public void create(String nimi, int ketjuId) throws SQLException {
+    public void create(String nimi, int ketjuId, String aika, int kayttajaId) throws SQLException {
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Viesti(teksti, viestiketju_id) VALUES(?, ?)");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Viesti(teksti, viestiketju_id, aika, kayttaja_id) VALUES(?, ?, ?, ?)");
         stmt.setObject(1, nimi);
         stmt.setObject(2, ketjuId);
+        stmt.setObject(3, aika);
+        stmt.setObject(4, kayttajaId);
 
         stmt.execute();
         stmt.close();
         conn.close();
 
     }
-    
+
     //Haetaan ketjuId viestiId:n perusteella, poista komennon uudelleenohjaamista varten
-    public int getKetjuId(int viestiId) throws SQLException{
+    public int getKetjuId(int viestiId) throws SQLException {
         Connection connection = database.getConnection();
         PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE id = ?;");
         stmt.setObject(1, viestiId);
-        
+
         ResultSet rs = stmt.executeQuery();
         int ketjuId = -1;
         while (rs.next()) {

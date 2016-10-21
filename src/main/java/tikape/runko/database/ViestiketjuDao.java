@@ -198,16 +198,18 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         Integer viestiID = -1;
         String teksti = "";
         String aika = "";
+        Integer lahettajaId = 0;
 
         while (rs.next()) {
             viestiID = rs.getInt("id");
             teksti = rs.getString("teksti");
             aika = rs.getString("aika");
+            lahettajaId = rs.getInt("kayttaja_id");
         }
         
         stmt.close();
         conn.close();
-        return new Viesti(viestiID, teksti, aika);
+        return new Viesti(viestiID, teksti, aika, lahettajaId);
     }
 
 }
