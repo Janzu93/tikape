@@ -71,7 +71,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
     public List<Viestiketju> findAll(int aihealueId) throws SQLException {
 
         Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?;");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?");
         stmt.setObject(1, aihealueId);
 
         ResultSet rs = stmt.executeQuery();
@@ -89,12 +89,12 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
 
         return viestiketjut;
     }
-    
+
     // palauttaa sortattuna uusimpien viestien perusteella
     public List<Viestiketju> findAllFromAihealue(int aihealueId) throws SQLException {
 
         Connection connection = database.getConnection();
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?;");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?");
         stmt.setObject(1, aihealueId);
 
         ResultSet rs = stmt.executeQuery();
@@ -114,23 +114,49 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         return viestiketjut;
     }
 
+    public List<Viestiketju> findAllFromAihealue(int aihealueId, int offset) throws SQLException {
+
+        Connection connection = database.getConnection();
+        
+        PreparedStatement stmt = connection.prepareStatement(
+                "SELECT * FROM Viestiketju LEFT JOIN Viesti ON Viesti.viestiketju_id = Viestiketju.id WHERE Viestiketju.aihealue_id = ? GROUP BY Viestiketju.id ORDER BY Viesti.id DESC LIMIT 10 OFFSET ?");
+        stmt.setObject(1, aihealueId);
+        stmt.setObject(2, offset);
+
+        ResultSet rs = stmt.executeQuery();
+        List<Viestiketju> viestiketjut = new ArrayList<>();
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            String nimi = rs.getString("otsikko");
+            viestiketjut.add(new Viestiketju(id, nimi, countViestit(id), getNewestPost(id)));
+        }
+
+        rs.close();
+        stmt.close();
+        connection.close();
+
+        // sortataan sen mukaan milloin uusin viesti on tullut. kai tän vois tehä SQL:ssäkin, mä_en_osaa
+      //  viestiketjut.sort(Comparator.comparing(ketju -> ketju.getUusinViesti().getAika(), Comparator.reverseOrder()));
+        return viestiketjut;
+    }
+
     @Override
     public void delete(Integer key) throws SQLException {
 
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Viestiketju WHERE id = ?;");
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Viestiketju WHERE id = ?");
 
         stmt.setObject(1, key);
 
         stmt.execute();
         stmt.close();
-        
+
         //poistetaan myös kaikki viestiketjuun liittyvät viestit (toiminnalisuuden voi siirtää myös mainiin, mutta siistimpi täällä)
         ViestiDao vd = new ViestiDao(this.database);
-        stmt = conn.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?;");
+        stmt = conn.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?");
         stmt.setObject(1, key);
         ResultSet rs = stmt.executeQuery();
-        
+
         while (rs.next()) {
             Integer id = rs.getInt("id");
             vd.delete(id);
@@ -186,10 +212,10 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         conn.close();
         return viestiLkm;
     }
-    
-    private Viesti getNewestPost(int ketjuId)  throws SQLException  {
+
+    private Viesti getNewestPost(int ketjuId) throws SQLException {
         Connection conn = database.getConnection();
-      
+
         // tää hakee kaikki 'ketjuID' kuuluvat viestit, sorttaa ne ajan mukaan ja palauttaa vaan uusimman ('LIMIT 1')
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM Viestiketju, Viesti WHERE Viesti.viestiketju_id = Viestiketju.id AND Viestiketju.id = ? ORDER BY Viesti.aika DESC LIMIT 1");
         stmt.setObject(1, ketjuId);
@@ -206,7 +232,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
             aika = rs.getString("aika");
             lahettajaId = rs.getInt("kayttaja_id");
         }
-        
+
         stmt.close();
         conn.close();
         return new Viesti(viestiID, teksti, aika, lahettajaId);

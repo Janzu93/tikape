@@ -27,6 +27,7 @@
         <strong class="column-3">Aika</strong>
         <ul>
             <li th:each="viesti : ${viestit}">
+
                 <div id="viesti">
                     <div id="viesti-ylaosa">
                         <div id="viesti-lahettaja">
@@ -51,9 +52,5 @@
 
         </ul>
 
-        <form method="POST">
-            <textarea rows="10" cols="50" name="teksti"/>
-            <input type="submit" value="Uusi viesti"/>
-        </form>
     </body>
 </html>

@@ -47,6 +47,22 @@ public class ViestiDao implements Dao<Viesti, Integer> {
 
         return viesti;
     }
+    
+        public int countViestit(int vkId) throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) AS lkm FROM Viesti WHERE Viesti.viestiketju_id = ?");
+        stmt.setObject(1, vkId);
+
+        ResultSet rs = stmt.executeQuery();
+        Integer viestiLkm = -1;
+
+        while (rs.next()) {
+            viestiLkm = rs.getInt("lkm");
+        }
+        stmt.close();
+        conn.close();
+        return viestiLkm;
+    }
 
     @Override
     public List<Viesti> findAll() throws SQLException {
@@ -95,13 +111,44 @@ public class ViestiDao implements Dao<Viesti, Integer> {
 
         return viestit;
     }
+    
+    public List<Viesti> findAllFromViestiketju(int viestiketjuId, int offset) throws SQLException {
+        
+        // Jos räjähtää niin vika on varmaan täällä
 
-    public List<Viesti> findAllWithNimimerkki(int vkid) throws SQLException {
+        Connection connection = database.getConnection();
+        
+        PreparedStatement stmt = connection.prepareStatement(
+                "SELECT * FROM Viesti WHERE viestiketju_id = ? LIMIT 5 OFFSET ?");
+        stmt.setObject(1, viestiketjuId);
+        stmt.setObject(2, offset);
+
+        ResultSet rs = stmt.executeQuery();
+        List<Viesti> viestit = new ArrayList<>();
+        while (rs.next()) {
+            Integer id = rs.getInt("id");
+            String teksti = rs.getString("teksti");
+            String aika = rs.getString("aika");
+            Integer lahettajaId = rs.getInt("kayttaja_id");
+            viestit.add(new Viesti(id, teksti, (aika == null) ? "aika on null" : aika, lahettajaId));
+        }
+
+        rs.close();
+        stmt.close();
+        connection.close();
+
+        // sortataan sen mukaan milloin uusin viesti on tullut. kai tän vois tehä SQL:ssäkin, mä_en_osaa
+      //  viestiketjut.sort(Comparator.comparing(ketju -> ketju.getUusinViesti().getAika(), Comparator.reverseOrder()));
+        return viestit;
+    }
+
+    public List<Viesti> findAllWithNimimerkki(int vkid, int offset) throws SQLException {
 
         Connection connection = database.getConnection();
         KayttajaDao kd = new KayttajaDao(database);
-        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?");
+        PreparedStatement stmt = connection.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ? LIMIT 5 OFFSET ?");
         stmt.setObject(1, vkid);
+        stmt.setObject(2, offset);
 
         ResultSet rs = stmt.executeQuery();
         List<Viesti> viestit = new ArrayList<>();

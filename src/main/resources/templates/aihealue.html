@@ -32,6 +32,11 @@
                 </form>
             </li>
         </ul>
+        <ul>
+            <li th:each="sivu: ${#numbers.sequence(1, sivumaara)}" style="display: inline-block">
+                <a th:href="@{~/aihealue/{id}?sivu={sivu}(id=${aihealue.id}, sivu=${sivu})}" th:text="${sivu}"></a>
+            </li>
+        </ul>
 
         <form method="POST">
             <input type="text" name="otsikko"/>

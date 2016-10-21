@@ -22,7 +22,6 @@
         
         <ul>
             <li th:each="aihealue : ${aihealueet}">
-
                 <a class="column-1" th:href="@{~/aihealue/{id}(id=${aihealue.id})}" th:text="${aihealue.otsikko}"></a>
                 <span class="column-2" th:text="${aihealue.viestienLukumaara}"></span>
                 <span class="column-3" th:text="${aihealue.uusinViesti.aika}"></span>
