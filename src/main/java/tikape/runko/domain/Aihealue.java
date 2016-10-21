@@ -5,20 +5,25 @@ package tikape.runko.domain;
  * @author janne
  */
 public class Aihealue {
-
-    public Aihealue(Integer id, String otsikko, int viestienLukumaara) {
-        this.id = id;
-        this.otsikko = otsikko;
-        this.viestienLukumaara = viestienLukumaara;
-    }
     
     private Integer id;
     private String otsikko;
     private Integer viestienLukumaara;
-
-    public Aihealue(Integer id, String otsikko, Integer viestiLkm) {
+    private Viesti uusinViesti;
+    
+    public Aihealue(Integer id, String otsikko, int viestienLukumaara, Viesti uusinViesti) {
         this.id = id;
         this.otsikko = otsikko;
+        this.viestienLukumaara = viestienLukumaara;
+        this.uusinViesti = uusinViesti;
+    }
+
+    public Viesti getUusinViesti() {
+        return uusinViesti;
+    }
+
+    public void setUusinViesti(Viesti uusinViesti) {
+        this.uusinViesti = uusinViesti;
     }
 
     public Integer getId() {
