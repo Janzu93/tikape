@@ -56,7 +56,10 @@ public class Main {
 
         // Luo uusi aihealue (POST Index)
         post("/", (req, res) -> {
-            ad.create(req.queryParams("otsikko"));
+            if (req.queryParams("otsikko").length() > 0) {
+                ad.create(req.queryParams("otsikko"));
+            }
+
             res.redirect("/");
             return "ok";
         });
@@ -82,7 +85,9 @@ public class Main {
 
         // Luo uusi viestiketju (POST Aihealue)
         post("/aihealue/:id", (req, res) -> {
-            vkd.create(req.queryParams("otsikko"), Integer.parseInt(req.params(":id")));
+            if (req.queryParams("otsikko").length() > 0) {
+                vkd.create(req.queryParams("otsikko"), Integer.parseInt(req.params(":id")));
+            }
             res.redirect("/aihealue/" + req.params(":id"));
             return "ok";
         });
@@ -100,7 +105,7 @@ public class Main {
             Integer sivu = (req.queryParams("sivu") != null) ? Integer.parseInt(req.queryParams("sivu")) : 1;
             Integer sivumaara = (int) Math.ceil(vd.countViestit(Integer.parseInt(req.params(":ketjuid"))) / 5.0);
             System.out.println(sivumaara);
-            
+
             data.put("viestit", vd.findAllWithNimimerkki(Integer.parseInt(req.params(":ketjuid")), (sivu - 1) * 5));
             data.put("ketju", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))));
             data.put("aihealue", ad.findOne(vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))))); // hakee Aihealue-objektin
@@ -111,16 +116,22 @@ public class Main {
 
         // Luo uusi viesti (POST Viestiketju)
         post("/ketju/:ketjuid", (req, res) -> {
-
-            if (!loginCheckNimi(kd.findAll(), req.cookie("login")).equals("null")) {
-                String nimimerkki = loginCheckNimi(kd.findAll(), req.cookie("login"));
-                vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), kd.findOne(nimimerkki).getId());
+            if (req.queryParams("teksti").length() > 0) {
+                if (!loginCheckNimi(kd.findAll(), req.cookie("login")).equals("null")) {
+                    String nimimerkki = loginCheckNimi(kd.findAll(), req.cookie("login"));
+                    vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), kd.findOne(nimimerkki).getId());
+                } else {
+                    vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), 0);
+                }
+                Integer sivumaara = (int) Math.ceil(vd.countViestit(Integer.parseInt(req.params(":ketjuid"))) / 5.0);
+                res.redirect("/ketju/" + req.params(":ketjuid") + "?sivu=" + sivumaara);
+                return "ok";
             } else {
-                vd.create(req.queryParams("teksti"), Integer.parseInt(req.params(":ketjuid")), 0);
+                Integer sivu = (req.queryParams("sivu") != null) ? Integer.parseInt(req.queryParams("sivu")) : 1;
+                res.redirect("/ketju/" + req.params(":ketjuid") + "?sivu=" + sivu);
+                return "ok";
             }
 
-            res.redirect("/ketju/" + req.params(":ketjuid"));
-            return "ok";
         });
 
         // Poista viesti
@@ -188,11 +199,13 @@ public class Main {
         });
 
         get("/logout", (req, res) -> {
+            if (req.cookie("login") != null) {
+                kd.login(kd.findWithLogin(req.cookie("login")).getId(), "0");
+                System.out.println("Käyttäjä kirjattu ulos (tietokanta)");
+                res.removeCookie("login");
+                System.out.println("Käyttäjä kirjattu ulos (cookie)");
+            }
 
-            kd.login(kd.findWithLogin(req.cookie("login")).getId(), "0");
-            System.out.println("Käyttäjä kirjattu ulos (tietokanta)");
-            res.removeCookie("login");
-            System.out.println("Käyttäjä kirjattu ulos (cookie)");
             res.redirect("/");
             return "ok";
         });
@@ -269,12 +282,12 @@ public class Main {
 
     public static String loginCheckNimi(List<Kayttaja> kayttajat, String cookie) {
         for (Kayttaja kayttaja : kayttajat) {
-            if (kayttaja.getLogin() == null) {
-                return "null";
+            if(kayttaja.getLogin() != null) {
+                if (kayttaja.getLogin().equals(cookie)) {
+                    return kayttaja.getNimimerkki();
+                }
             }
-            if (kayttaja.getLogin().equals(cookie)) {
-                return kayttaja.getNimimerkki();
-            }
+            
         }
         return "null";
     }
