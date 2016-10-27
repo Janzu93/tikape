@@ -22,9 +22,9 @@
 
         <!-- Halutaanko erilainen layout näille viesteille ? -->
 
-        <strong class="column-1-long">Viesti</strong>
+<!--        <strong class="column-1-long">Viesti</strong>
         <strong class="column-2">Lahettaja</strong>
-        <strong class="column-3">Aika</strong>
+        <strong class="column-3">Aika</strong>-->
         <ul>
             <li th:each="viesti : ${viestit}">
 
@@ -33,10 +33,11 @@
                         <div id="viesti-lahettaja">
                             <span th:text="${viesti.lahettaja}"></span>
                         </div>                        
-                        <div id="viesti-poista">
-                            <form th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
+                        <div id="viesti-poista" th:switch="${kayttaja != null} ? ${kayttaja.tyyppi}">
+                            <form th:case="'1'" th:action="@{~/viesti/{id}/delete(id=${viesti.id})}" method="POST">
                                 <input type="submit" value="Poista"/>
                             </form>
+                            <p th:case="*"></p>
                         </div>
                         <div id="viesti-aika">
                             <span th:text="${viesti.aika}"></span>                            

@@ -25,9 +25,12 @@
                 <a class="column-1" th:href="@{~/aihealue/{id}(id=${aihealue.id})}" th:text="${aihealue.otsikko}"></a>
                 <span class="column-2" th:text="${aihealue.viestienLukumaara}"></span>
                 <span class="column-3" th:text="${aihealue.uusinViesti.aika}"></span>
-                <form class="column-4" th:action="@{~/aihealue/{id}/delete(id=${aihealue.id})}" method="POST">
+                <div class="column-4" th:switch="${kayttaja != null} ? ${kayttaja.tyyppi}">
+                    <form th:case="'1'" th:action="@{~/aihealue/{id}/delete(id=${aihealue.id})}" method="POST">
                     <input type="submit" value="Poista"/>
+                    <p th:case="*"></p>
                 </form>
+                </div>
             </li>
         </ul>
 
