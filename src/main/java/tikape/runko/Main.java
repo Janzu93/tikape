@@ -238,7 +238,7 @@ public class Main {
                         login = genSalt(128);
                     }
 
-                    res.cookie("login", login, 60 * 60 * 24);
+                    res.cookie("login", login, 60 * 60);
                     kd.login(kd.findOne(req.queryParams("kayttajanimi")).getId(), login);
                     System.out.println("Käyttäjä kirjattu sisään");
                     res.redirect("/");
