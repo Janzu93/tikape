@@ -105,7 +105,11 @@ public class Main {
             }
             data.put("ketjut", vkd.findAllFromAihealue(Integer.parseInt(req.params(":id")), (sivu - 1) * 10));
             data.put("aihealue", ad.findOne(Integer.parseInt(req.params(":id"))));
-            data.put("sivumaara", sivumaara);
+            if (sivumaara > 0) {
+                data.put("sivumaara", sivumaara);
+            } else {
+                data.put("sivumaara", 1);
+            }
 
             return new ModelAndView(data, "aihealue");
         }, new ThymeleafTemplateEngine()
@@ -147,7 +151,11 @@ public class Main {
             data.put("viestit", vd.findAllWithNimimerkki(Integer.parseInt(req.params(":ketjuid")), (sivu - 1) * 5));
             data.put("ketju", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))));
             data.put("aihealue", ad.findOne(vkd.findAihealueId(Integer.parseInt(req.params(":ketjuid"))))); // hakee Aihealue-objektin
-            data.put("sivumaara", sivumaara);
+            if (sivumaara > 0) {
+                data.put("sivumaara", sivumaara);
+            } else {
+                data.put("sivumaara", 1);
+            }
 
             return new ModelAndView(data, "viestiketju");
         }, new ThymeleafTemplateEngine());
