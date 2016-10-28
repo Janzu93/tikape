@@ -43,6 +43,9 @@ public class Main {
 
                 String nimi = loginCheckNimi(kd.findAll(), req.cookie("login"));
                 if (!nimi.equals("null")) {
+
+                    data.put("kayttaja", kd.findWithLogin(req.cookie("login")));
+
                     data.put("login", "Tervetuloa " + nimi);
                     System.out.println("Käyttäjä tunnistettu onnistuneesti");
                     return new ModelAndView(data, "index");
@@ -75,13 +78,17 @@ public class Main {
             HashMap data = new HashMap<>();
             Integer sivu = (req.queryParams("sivu") != null) ? Integer.parseInt(req.queryParams("sivu")) : 1;
             Integer sivumaara = (int) Math.ceil(vkd.findAllFromAihealue(Integer.parseInt(req.params(":id"))).size() / 10.0);
-
+            String nimi = loginCheckNimi(kd.findAll(), req.cookie("login"));
+            if (!nimi.equals("null")) {
+                data.put("kayttaja", kd.findWithLogin(req.cookie("login")));
+            }
             data.put("ketjut", vkd.findAllFromAihealue(Integer.parseInt(req.params(":id")), (sivu - 1) * 10));
             data.put("aihealue", ad.findOne(Integer.parseInt(req.params(":id"))));
             data.put("sivumaara", sivumaara);
 
             return new ModelAndView(data, "aihealue");
-        }, new ThymeleafTemplateEngine());
+        }, new ThymeleafTemplateEngine()
+        );
 
         // Luo uusi viestiketju (POST Aihealue)
         post("/aihealue/:id", (req, res) -> {
@@ -105,6 +112,11 @@ public class Main {
             Integer sivu = (req.queryParams("sivu") != null) ? Integer.parseInt(req.queryParams("sivu")) : 1;
             Integer sivumaara = (int) Math.ceil(vd.countViestit(Integer.parseInt(req.params(":ketjuid"))) / 5.0);
             System.out.println(sivumaara);
+
+            String nimi = loginCheckNimi(kd.findAll(), req.cookie("login"));
+            if (!nimi.equals("null")) {
+                data.put("kayttaja", kd.findWithLogin(req.cookie("login")));
+            }
 
             data.put("viestit", vd.findAllWithNimimerkki(Integer.parseInt(req.params(":ketjuid")), (sivu - 1) * 5));
             data.put("ketju", vkd.findOne(Integer.parseInt(req.params(":ketjuid"))));
@@ -268,8 +280,8 @@ public class Main {
         });
 
     }
-
     // Luo satunnaisen alfanumeerisen merkkijonon suolaksi
+
     public static String genSalt(int len) {
         String AB = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         SecureRandom rnd = new SecureRandom();
@@ -282,12 +294,12 @@ public class Main {
 
     public static String loginCheckNimi(List<Kayttaja> kayttajat, String cookie) {
         for (Kayttaja kayttaja : kayttajat) {
-            if(kayttaja.getLogin() != null) {
+            if (kayttaja.getLogin() != null) {
                 if (kayttaja.getLogin().equals(cookie)) {
                     return kayttaja.getNimimerkki();
                 }
             }
-            
+
         }
         return "null";
     }
