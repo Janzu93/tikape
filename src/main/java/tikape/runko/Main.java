@@ -80,8 +80,10 @@ public class Main {
 
         // Luo uusi aihealue (POST Index)
         post("/", (req, res) -> {
-            if (req.queryParams("otsikko").length() > 0) {
+            if (req.queryParams("otsikko").length() > 0 && req.queryParams("otsikko").length() <= 20) {
                 ad.create(req.queryParams("otsikko"));
+            } else {
+                return "liian pitkä otsikko (maksimi 20 merkkiä)";
             }
 
             res.redirect("/");
@@ -117,13 +119,15 @@ public class Main {
 
         // Luo uusi viestiketju (POST Aihealue)
         post("/aihealue/:id", (req, res) -> {
-            if (req.queryParams("otsikko").length() > 0 && req.queryParams("viesti").length() > 0) {
+            if (req.queryParams("otsikko").length() > 0 && req.queryParams("viesti").length() > 0 && req.queryParams("otsikko").length() <= 20) {
                 vkd.create(req.queryParams("otsikko"), Integer.parseInt(req.params(":id")));
                 if (kd.findWithLogin(req.cookie("login")) != null) {
                     vd.create(req.queryParams("viesti"), vkd.uusinKetjuId(), kd.findWithLogin(req.cookie("login")).getId());
                 } else {
                     vd.create(req.queryParams("viesti"), vkd.uusinKetjuId(), 0);
                 }
+            } else {
+                return "viestiketjua ei luotu. Onko otsikko liian pitkä (max. 20 merkkiä) tai viestin sisältö tyhjä?";
             }
             res.redirect("/aihealue/" + req.params(":id"));
             return "ok";
