@@ -146,7 +146,7 @@ public class KayttajaDao implements Dao<Kayttaja, Integer> {
 
     public void create(String nimi, String salt, String hash) throws SQLException {
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Kayttaja(nimimerkki, salt, hash) VALUES(?, ?, ?)");
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO Kayttaja(nimimerkki, salt, hash, tyyppi) VALUES(?, ?, ?, 0)");
         stmt.setObject(1, nimi);
         stmt.setObject(2, salt);
         stmt.setObject(3, hash);

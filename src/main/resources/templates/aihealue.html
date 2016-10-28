@@ -13,6 +13,7 @@
     </head>
 
     <body>
+        <iframe src="/ylapalkki" width="100%" height="75" scrolling="no">Yläpalkki ei näy koska selain ei tue iframeja</iframe>
         <!-- Etusivu > Aihealue.otsikko  -->
         <h1> 
             <a href='/'>Etusivu</a> > <span th:text="${aihealue.otsikko}"></span>
@@ -27,9 +28,12 @@
                 <a class="column-1" th:href="@{~/ketju/{id}(id=${ketju.id})}" th:text='${ketju.otsikko}'> </a>
                 <span class="column-2" th:text="${ketju.viestienLkm}"></span>
                 <span class="column-3" th:text="${ketju.uusinViesti.aika}"></span>
-                <form class="column-4" th:action="@{~/ketju/{id}/delete(id=${ketju.id})}" method="POST">
-                    <input type="submit" value="Poista"/>
-                </form>
+                <div class="column-4" th:switch="${kayttaja != null} ? ${kayttaja.tyyppi}">
+                    <form th:case="'1'" th:action="@{~/ketju/{id}/delete(id=${ketju.id})}" method="POST">
+                        <input type="submit" value="Poista"/>
+                        <p th:case="*"></p>
+                    </form>
+                </div>
             </li>
         </ul>
         <strong>Sivut</strong><br/>

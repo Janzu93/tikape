@@ -81,17 +81,10 @@ public class AihealueDao implements Dao<Aihealue, Integer> {
         stmt.close();
         
         //poistetaan myös viestiketjut, ks viestiketjuDao 
-        ViestiketjuDao vkd = new ViestiketjuDao(this.database);
-        stmt = conn.prepareStatement("SELECT * FROM Viestiketju WHERE aihealue_id = ?;");
+        stmt = conn.prepareStatement("DELETE FROM Viestiketju WHERE aihealue_id = ?;");
         stmt.setObject(1, key);
-        ResultSet rs = stmt.executeQuery();
+        stmt.execute();
         
-        stmt.close();
-        
-        while (rs.next()) {
-            Integer id = rs.getInt("id");
-            vkd.delete(id);
-        }
         stmt.close();
         conn.close();
 

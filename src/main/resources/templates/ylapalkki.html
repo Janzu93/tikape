@@ -1,0 +1,24 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+        <title>4umiChan</title>
+        <meta charset="utf-8" />
+
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> </link>
+        <link rel="stylesheet" href="/common.css"></link>
+
+    </head>
+    <body>
+        <a href="/" target="_parent"><button style="font-size:25px">Tervetuloa 4umiChaniin</button></a>
+        <strong th:switch="${kayttaja != null} ? ${kayttaja.tyyppi}">
+            <a th:case="'0'" href="/logout" target="_parent"><button style="float:right; ">Kirjaudu ulos</button></a>
+            <a th:case="'1'" href="/logout" target="_parent"><button style="float:right; ">Kirjaudu ulos</button></a>
+            <strong th:case="*">
+                <a href="/login" target="_parent"><button style="float:right; padding-right:5px">Kirjautumiseen</button></a>
+                <a href="/register" target="_parent"><button style="float:right; padding-right:5px">Rekisteröitymään</button></a>
+            </strong>
+        </strong>
+        <strong style="font-size:25px; float:right; padding-right:25px" th:text="${login}">Kirjautumistiedot</strong>
+    </body>
+</html>

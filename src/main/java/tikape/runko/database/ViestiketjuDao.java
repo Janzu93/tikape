@@ -117,7 +117,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
     public List<Viestiketju> findAllFromAihealue(int aihealueId, int offset) throws SQLException {
 
         Connection connection = database.getConnection();
-        
+
         PreparedStatement stmt = connection.prepareStatement(
                 "SELECT * FROM Viestiketju LEFT JOIN Viesti ON Viesti.viestiketju_id = Viestiketju.id WHERE Viestiketju.aihealue_id = ? GROUP BY Viestiketju.id ORDER BY Viesti.id DESC LIMIT 10 OFFSET ?");
         stmt.setObject(1, aihealueId);
@@ -136,7 +136,7 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         connection.close();
 
         // sortataan sen mukaan milloin uusin viesti on tullut. kai tän vois tehä SQL:ssäkin, mä_en_osaa
-      //  viestiketjut.sort(Comparator.comparing(ketju -> ketju.getUusinViesti().getAika(), Comparator.reverseOrder()));
+        //  viestiketjut.sort(Comparator.comparing(ketju -> ketju.getUusinViesti().getAika(), Comparator.reverseOrder()));
         return viestiketjut;
     }
 
@@ -144,23 +144,19 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
     public void delete(Integer key) throws SQLException {
 
         Connection conn = database.getConnection();
-        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Viestiketju WHERE id = ?");
+
+        //poistetaan myös kaikki viestiketjuun liittyvät viestit (toiminnalisuuden voi siirtää myös mainiin, mutta siistimpi täällä)
+        ViestiDao vd = new ViestiDao(this.database);
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM Viesti WHERE viestiketju_id = ?");
+        stmt.setObject(1, key);
+        stmt.execute();
+        stmt.close();
+
+        stmt = conn.prepareStatement("DELETE FROM Viestiketju WHERE id = ?");
 
         stmt.setObject(1, key);
 
         stmt.execute();
-        stmt.close();
-
-        //poistetaan myös kaikki viestiketjuun liittyvät viestit (toiminnalisuuden voi siirtää myös mainiin, mutta siistimpi täällä)
-        ViestiDao vd = new ViestiDao(this.database);
-        stmt = conn.prepareStatement("SELECT * FROM Viesti WHERE viestiketju_id = ?");
-        stmt.setObject(1, key);
-        ResultSet rs = stmt.executeQuery();
-
-        while (rs.next()) {
-            Integer id = rs.getInt("id");
-            vd.delete(id);
-        }
         stmt.close();
         conn.close();
 
@@ -177,13 +173,13 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         conn.close();
 
     }
-    
+
     public int uusinKetjuId() throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("SELECT MAX(id) FROM Viestiketju");
         Integer id = null;
         ResultSet rs = stmt.executeQuery();
-        
+
         while (rs.next()) {
             id = rs.getInt("MAX(id)");
         }

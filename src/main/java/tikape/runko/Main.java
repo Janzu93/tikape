@@ -46,15 +46,36 @@ public class Main {
 
                     data.put("kayttaja", kd.findWithLogin(req.cookie("login")));
 
-                    data.put("login", "Tervetuloa " + nimi);
+                    data.put("login", "olet kirjautunut sisään käyttäjänä " + nimi);
                     System.out.println("Käyttäjä tunnistettu onnistuneesti");
                     return new ModelAndView(data, "index");
                 }
 
             }
 
-            data.put("login", "Et ole kirjautunut sisään!");
+            data.put("login", "et ole kirjautunut sisään!");
             return new ModelAndView(data, "index");
+        }, new ThymeleafTemplateEngine());
+
+        get("/ylapalkki", (req, res) -> {
+            HashMap data = new HashMap<>();
+
+            if (req.cookie("login") != null) {
+
+                String nimi = loginCheckNimi(kd.findAll(), req.cookie("login"));
+                if (!nimi.equals("null")) {
+
+                    data.put("kayttaja", kd.findWithLogin(req.cookie("login")));
+
+                    data.put("login", "Tervetuloa " + nimi);
+                    System.out.println("Käyttäjä tunnistettu onnistuneesti");
+                    return new ModelAndView(data, "ylapalkki");
+                }
+
+            }
+            data.put("login", "Et ole kirjautunut sisään!");
+
+            return new ModelAndView(data, "ylapalkki");
         }, new ThymeleafTemplateEngine());
 
         // Luo uusi aihealue (POST Index)
