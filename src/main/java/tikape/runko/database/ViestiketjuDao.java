@@ -177,6 +177,20 @@ public class ViestiketjuDao implements Dao<Viestiketju, Integer> {
         conn.close();
 
     }
+    
+    public int uusinKetjuId() throws SQLException {
+        Connection conn = database.getConnection();
+        PreparedStatement stmt = conn.prepareStatement("SELECT MAX(id) FROM Viestiketju");
+        Integer id = null;
+        ResultSet rs = stmt.executeQuery();
+        
+        while (rs.next()) {
+            id = rs.getInt("MAX(id)");
+        }
+        stmt.close();
+        conn.close();
+        return id;
+    }
 
     public int findAihealueId(int vkId) throws SQLException {
         Connection conn = database.getConnection();

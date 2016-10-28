@@ -4,24 +4,24 @@
     <head>
         <title>4umiChan</title>
         <meta charset="utf-8" />
-        
+
         <!-- bootstrap. tää heittää kivat fontit noihin teksteihin, 
              voisi ehkä ladata kivat fontit itekkin ilman että latais koko bootstrappia -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> </link>
         <link rel="stylesheet" href="/common.css"></link>
-      
+
     </head>
 
     <body>
-         <!-- Etusivu > Aihealue.otsikko  -->
+        <!-- Etusivu > Aihealue.otsikko  -->
         <h1> 
             <a href='/'>Etusivu</a> > <span th:text="${aihealue.otsikko}"></span>
         </h1>
-         
+
         <strong class="column-1">Otsikko</strong>
         <strong class="column-2">Viestien lukumaara</strong>
         <strong class="column-3">Uusin viesti </strong>
-        
+
         <ul>
             <li th:each="ketju : ${ketjut}" style="display: block">
                 <a class="column-1" th:href="@{~/ketju/{id}(id=${ketju.id})}" th:text='${ketju.otsikko}'> </a>
@@ -32,6 +32,7 @@
                 </form>
             </li>
         </ul>
+        <strong>Sivut</strong><br/>
         <ul>
             <li th:each="sivu: ${#numbers.sequence(1, sivumaara)}" style="display: inline-block">
                 <a th:href="@{~/aihealue/{id}?sivu={sivu}(id=${aihealue.id}, sivu=${sivu})}" th:text="${sivu}"></a>
@@ -39,8 +40,15 @@
         </ul>
 
         <form method="POST">
-            <input type="text" name="otsikko"/>
-            <input type="submit" value="Uusi viestiketju"/>
-        </form>
+            <strong>Otsikko</strong><br/>
+            <input type="text" name="otsikko"/><br/>
+            <strong>Viesti</strong><br/>
+            <textarea rows="10" cols="50" name="viesti"/>
+            <input type="submit" onclick="submit" value="Uusi viestiketju"/>
+        </form>            
+        <script>
+            document.getElementById('otsikko').submit();
+            document.getElementById('viesti').submit();
+        </script>
     </body>
 </html>

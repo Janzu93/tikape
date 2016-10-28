@@ -187,10 +187,10 @@ public class ViestiDao implements Dao<Viesti, Integer> {
         conn.close();
     }
 
-    public void create(String nimi, int ketjuId, int kayttajaId) throws SQLException {
+    public void create(String teksti, int ketjuId, int kayttajaId) throws SQLException {
         Connection conn = database.getConnection();
         PreparedStatement stmt = conn.prepareStatement("INSERT INTO Viesti(teksti, viestiketju_id, kayttaja_id) VALUES(?, ?, ?)");
-        stmt.setObject(1, nimi);
+        stmt.setObject(1, teksti);
         stmt.setObject(2, ketjuId);
         stmt.setObject(3, kayttajaId);
 
