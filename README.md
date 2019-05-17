@@ -1,3 +1,3 @@
 # 4UmiChan
 
-4UmiChanin gitti
+Project for Tietokantojen perusteet course at University of Helsinki, Computer Science
